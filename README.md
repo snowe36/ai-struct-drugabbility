@@ -70,7 +70,13 @@ Literature NMR labels (not Dyna-1 weights). Pocket volumes are ligand-scale empt
 
 TEM-1: the horn lining is buried hydrophobic core, not the Ω-loop. Savard/Gagné μs–ms exchange is at the Ω-loop and active-site vicinity. Low cryptic enrichment is a result — NMR dynamics are a prior for *motion*, not a pocket oracle. **RelaxDB-CPMG has no TEM-1 entry.** The Kern 2026 `BLAC_CPMG` sequence is Mtb BlaC (`P9WKD3`), not TEM-1 (`P62593`). Those labels are not mapped onto `1BTL`/`1PZO`.
 
-KRAS: switch-I/II carry the published μs–ms signal **and** line the sotorasib site. Enrichment here is the expected positive control for the same question. `--prior relaxdb` replaces the conservative YAML subset with the official KRAS_CPMG X/Y set (58 residues, including the P-loop).
+KRAS: switch-I/II carry the published μs–ms signal **and** line the sotorasib site. Enrichment here is the expected positive control for the same question. `--prior relaxdb` replaces the conservative YAML subset with the official KRAS_CPMG X/Y set (58 residues, including the P-loop):
+
+| Case | Prior | ∩ cryptic | Cryptic enrichment | ∩ control | Control enrichment |
+|------|-------|-----------|--------------------|-----------|--------------------|
+| KRAS switch-II | RelaxDB-CPMG | 19/26 | **2.10** | 7/16 nucleotide | 1.26 |
+
+More labels (P-loop plus switch) raise the background, so cryptic enrichment falls versus the curated subset. That is the actual-label result, not a bug. TEM-1 stays on literature: there is no TEM-1 row in RelaxDB-CPMG.
 
 Headline geometry is **seed clearance**, not matched-site volume. Detector `0.2.0`: holo can be scored with the ligand **excluded** from the distance field (default; protein conformation) or **included** (ligand-occupied void). TEM-1 horn clearance still rises apo → holo (3.45 → 4.02 Å) in exclude mode; volume is not the claim.
 
