@@ -33,14 +33,15 @@ cryptic_site:
 
 # Literature NMR, not a Dyna-1 dump. Savard & Gagné 2006: TEM-1 is highly
 # ordered on ps–ns, with μs–ms exchange at the Ω-loop and active-site vicinity.
-# RelaxDB-CPMG "BLAC" in Kern 2026 is TEM-1 (Ubbink/Elings). These residue
-# lists are a conservative curated subset for the overlap test.
+# RelaxDB-CPMG BLAC_CPMG is Mtb BlaC (P9WKD3), not TEM-1 (P62593). Do not map
+# those labels onto 1BTL/1PZO. --prior literature stays the TEM-1 fallback.
 nmr_exchange:
-  source: "Savard & Gagné 2006 Biochemistry; RelaxDB-CPMG BLAC (Kern 2026)"
+  source: "Savard & Gagné 2006 Biochemistry (literature prior; no TEM-1 in RelaxDB-CPMG)"
   residues: [68, 69, 70, 71, 72, 73, 130, 131, 132, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 234, 235, 236, 244]
   note: >
     Ω-loop and catalytic vicinity. Horn-lining residues are mostly NOT in this
     set — that mismatch is part of the measurement, not a bug to paper over.
+    RelaxDB-CPMG has no TEM-1 entry; BLAC is a different β-lactamase.
 
 cameras:
   overview: {turn: [40, -20, 10], slab: [ -5, 25 ]}

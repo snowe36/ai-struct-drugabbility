@@ -28,15 +28,15 @@ cryptic_site:
   residues: [8, 9, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 92, 95, 96, 99, 100]
   label: switch-II pocket lining
 
-# KRAS 15N relaxation / CPMG literature plus Dyna-1 Fig. 5 (Kern 2026).
-# Switch regions, not the buried nucleotide cleft, carry the μs–ms signal
-# in most GDP/GTP NMR studies. Curated conservative subset.
+# YAML list is a conservative switch-I/II subset for --prior literature (CI).
+# Official RelaxDB-CPMG KRAS_CPMG labels (X/Y) live in resources/relaxdb_cpmg.yaml
+# and are used with --prior relaxdb. Sequence index == KRAS residue number.
 nmr_exchange:
-  source: "KRAS NMR Dryad 10.5061/dryad.j6q573nm0; RelaxDB KRAS (Kern 2026)"
+  source: "KRAS NMR Dryad 10.5061/dryad.j6q573nm0; conservative literature subset"
   residues: [30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76]
   note: >
-    Switch-I and switch-II. Overlap with the sotorasib lining is expected;
-    overlap with the nucleotide site is the negative control.
+    Switch-I and switch-II subset. --prior relaxdb replaces this with the full
+    KRAS_CPMG X/Y set (58 residues, including P-loop). Nucleotide site is control.
 
 cameras:
   overview: {turn: [30, 40, 0], slab: [ -4, 20 ]}
