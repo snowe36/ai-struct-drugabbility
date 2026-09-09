@@ -9,6 +9,9 @@ if [ ! -f /workspace/Dyna-1/dyna1.py ]; then
 fi
 cd /workspace/Dyna-1
 
+python3 -m venv --system-site-packages /workspace/venv
+# shellcheck disable=SC1091
+source /workspace/venv/bin/activate
 python -m pip install -U pip
 if [ -f requirements.txt ]; then
   python -m pip install -r requirements.txt
