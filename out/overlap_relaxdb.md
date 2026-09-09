@@ -22,10 +22,10 @@ are a prior for *motion*, not a pocket oracle.
 
 - Apo `5V9U` site recovered: **True** (clearance 4.21 Å; volume 909 Å³ is secondary)
 - Holo `6OIM` site recovered: **True** (clearance 4.40 Å; volume 602 Å³ is secondary)
-- NMR ∩ cryptic lining: 19/26 (enrichment 4.07)
-- NMR ∩ control site: 3/16 (enrichment 1.04)
-- Odds ratio (cryptic vs control): 11.76
-- Prior: `nmr_literature` (Dyna-1 vs literature when both exist)
+- NMR ∩ cryptic lining: 19/26 (enrichment 2.10)
+- NMR ∩ control site: 7/16 (enrichment 1.26)
+- Odds ratio (cryptic vs control): 3.49
+- Prior: `relaxdb_cpmg` (Dyna-1 vs literature when both exist)
 
 KRAS switch-I/II carry most published μs–ms NMR signal and also line
 the sotorasib site. Enrichment here is the expected positive control
