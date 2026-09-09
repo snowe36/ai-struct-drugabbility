@@ -1,0 +1,52 @@
+name: tem1_horn
+title: TEM-1 β-lactamase cryptic horn pocket
+uniprot: P62593
+chain: A
+
+# Crystal pair (Horn & Shoichet 2004). Helices 11/12 packed in apo;
+# CBT pries them apart in 1PZO. This is a cryptic allosteric site ~16 Å
+# from Ser70, not a preformed catalytic cleft.
+structures:
+  apo:
+    pdb_id: 1BTL
+    description: Apo TEM-1, horn closed
+  holo:
+    pdb_id: 1PZO
+    ligand_resname: CBT
+    ligand_resseq: 300
+    description: CBT-bound, horn open
+
+catalytic_site:
+  # Ambler numbering as in 1BTL/1PZO
+  residues: [70, 73, 130, 166, 234, 244]
+  label: catalytic / penicillin-binding
+
+omega_loop:
+  residues: [161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179]
+  label: Ω-loop (MD-discovered cryptic site; often μs–ms)
+
+cryptic_site:
+  name: horn
+  # Helix 11 ~218–224, helix 12 ~272–290; core-facing lining from 1PZO
+  residues: [194, 201, 218, 219, 220, 221, 222, 223, 224, 250, 260, 263, 272, 273, 276, 279, 280, 286]
+  label: horn (helices 11/12)
+
+# Literature NMR, not a Dyna-1 dump. Savard & Gagné 2006: TEM-1 is highly
+# ordered on ps–ns, with μs–ms exchange at the Ω-loop and active-site vicinity.
+# RelaxDB-CPMG "BLAC" in Kern 2026 is TEM-1 (Ubbink/Elings). These residue
+# lists are a conservative curated subset for the overlap test.
+nmr_exchange:
+  source: "Savard & Gagné 2006 Biochemistry; RelaxDB-CPMG BLAC (Kern 2026)"
+  residues: [68, 69, 70, 71, 72, 73, 130, 131, 132, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 234, 235, 236, 244]
+  note: >
+    Ω-loop and catalytic vicinity. Horn-lining residues are mostly NOT in this
+    set — that mismatch is part of the measurement, not a bug to paper over.
+
+cameras:
+  overview: {turn: [40, -20, 10], slab: [ -5, 25 ]}
+  horn: {turn: [120, 15, 0], slab: [ -2, 12 ]}
+
+references:
+  - Horn JR, Shoichet BK. (2004) Chem Biol. PDB 1PZO.
+  - Savard PY, Gagné SM. (2006) Biochemistry 45:11414.
+  - Wayment-Steele HK et al. (2026) Nature. Dyna-1 / RelaxDB-CPMG BLAC.

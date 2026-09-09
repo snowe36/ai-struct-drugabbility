@@ -1,0 +1,44 @@
+name: vp35_iid
+title: Ebola/filovirus VP35 interferon inhibitory domain cryptic pocket
+uniprot: Q05127
+chain: A
+
+# Bowman lab: cryptic pocket opening allosterically toggles dsRNA binding
+# mode. Public FAST + Folding@home trajectories on Zenodo (do not commit).
+# Open/closed CV used in the eLife 2025 paper: distance residues 225–295
+# (Zaire IID numbering); helix 305–309 peels off the helical domain.
+structures:
+  crystal:
+    pdb_id: 3FKE
+    description: Zaire VP35 IID crystal (pocket closed in the ground state)
+
+cryptic_site:
+  name: vp35_cryptic
+  residues: [221, 225, 248, 280, 290, 291, 292, 293, 294, 295, 305, 306, 307, 308, 309]
+  label: cryptic IID pocket lining
+
+open_closed_cv:
+  residue_i: 225
+  residue_j: 295
+  atom: CA
+  note: Distance used by Mallimadugula et al. to score pocket opening.
+
+zenodo:
+  record: "15854842"
+  # Downsampled FAH is still multi-GB. Demo never downloads this.
+  files:
+    zaire_fah: vp35_zaire-2019-FAH-amber03-tip3p-1-10x-downsampled.tar.gz
+    reston_fah: vp35_reston-2020-FAH-amber03-tip3p-1-10x-downsampled.tar.gz
+    marburg_fah: vp35_marburg-2020-FAH-amber03-tip3p-1-10x-downsampled.tar.gz
+  default: zaire_fah
+  stride: 50
+  max_frames: 400
+
+nmr_exchange:
+  source: "No RelaxDB CPMG for VP35 IID in Kern 2026; Dyna-1 is the residue prior."
+  residues: []
+  note: Overlap for VP35 uses Dyna-1 p(exchange) when weights are available.
+
+references:
+  - Cruz MA et al. (2022) Nat Commun 13:2269.
+  - Mallimadugula UL et al. (2025) eLife. Zenodo 10.5281/zenodo.15854842.

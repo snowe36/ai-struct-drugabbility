@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite this repository and the
+  experimental / methods papers it wraps.
+title: "Pocket Atlas: NMR-timescale dynamics as a prior for cryptic ligandable sites"
+type: software
+version: "0.1.0"
+authors:
+  - family-names: Snow
+    given-names: Eric
+license: MIT
+repository-code: "https://github.com/snowe36/ai-struct-drugabbility"
+abstract: >-
+  A reproducible toolkit asking whether NMR-timescale dynamic residues
+  (Dyna-1 / RelaxDB-CPMG) spatially coincide with cryptic ligandable sites
+  on TEM-1 and KRAS, with an optional long-MD arm on public VP35 FAH/FAST
+  trajectories. Dyna-1 predicts where micro-millisecond motion occurs; it
+  does not generate molecular dynamics trajectories.
+keywords:
+  - cryptic pockets
+  - NMR dynamics
+  - structure-based drug design
+  - TEM-1
+  - KRAS
+  - VP35

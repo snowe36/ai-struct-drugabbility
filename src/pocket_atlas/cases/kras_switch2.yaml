@@ -1,0 +1,47 @@
+name: kras_switch2
+title: KRAS switch-II cryptic pocket
+uniprot: P01116
+chain: A
+
+# Switch-II pocket is the oral small-molecule site (sotorasib / adagrasib /
+# MRTX1133). It is poorly formed in many GTP-KRAS apo crystals and occupied
+# in covalent G12C holos. 5V9U = G12C·GDP; 6OIM = G12C·sotorasib (MOV).
+structures:
+  apo:
+    pdb_id: 5V9U
+    description: KRAS G12C·GDP, switch-II not ligand-occupied
+  holo:
+    pdb_id: 6OIM
+    ligand_resname: MOV
+    description: KRAS G12C·sotorasib, switch-II occupied
+
+nucleotide_site:
+  residues: [13, 14, 15, 16, 17, 18, 28, 29, 30, 32, 35, 116, 119, 145, 146, 147]
+  label: nucleotide (GDP/GTP) site
+
+switch_i:
+  residues: [30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40]
+  label: switch-I
+
+cryptic_site:
+  name: switch2
+  residues: [8, 9, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 92, 95, 96, 99, 100]
+  label: switch-II pocket lining
+
+# KRAS 15N relaxation / CPMG literature plus Dyna-1 Fig. 5 (Kern 2026).
+# Switch regions, not the buried nucleotide cleft, carry the μs–ms signal
+# in most GDP/GTP NMR studies. Curated conservative subset.
+nmr_exchange:
+  source: "KRAS NMR Dryad 10.5061/dryad.j6q573nm0; RelaxDB KRAS (Kern 2026)"
+  residues: [30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76]
+  note: >
+    Switch-I and switch-II. Overlap with the sotorasib lining is expected;
+    overlap with the nucleotide site is the negative control.
+
+cameras:
+  overview: {turn: [30, 40, 0], slab: [ -4, 20 ]}
+  switch2: {turn: [80, -10, 20], slab: [ -2, 10 ]}
+
+references:
+  - Canon J et al. (2019) Nature. Sotorasib / AMG 510. PDB 6OIM.
+  - Wayment-Steele HK et al. (2026) Nature. Dyna-1 on KRAS.

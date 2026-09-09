@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pocket-atlas"
+version = "0.1.0"
+description = "NMR-timescale dynamics as a prior for cryptic ligandable sites (TEM-1, KRAS, VP35)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Eric Snow" }]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.11",
+    "pandas>=2.0",
+    "matplotlib>=3.7",
+    "PyYAML>=6.0",
+    "requests>=2.31",
+    "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "ruff>=0.6"]
+dyna = ["torch>=2.1"]
+md = ["mdtraj>=1.9.9"]
+pymol = []
+
+[project.scripts]
+pocket-fetch = "pocket_atlas.cli:fetch_main"
+pocket-prepare = "pocket_atlas.cli:prepare_main"
+pocket-dyna = "pocket_atlas.cli:dyna_main"
+pocket-detect = "pocket_atlas.cli:detect_main"
+pocket-overlap = "pocket_atlas.cli:overlap_main"
+pocket-fetch-md = "pocket_atlas.cli:fetch_md_main"
+pocket-report = "pocket_atlas.cli:report_main"
+pocket-figures = "pocket_atlas.cli:figures_main"
+pocket-demo = "pocket_atlas.demo:run_demo_main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pocket_atlas = ["cases/*.yaml", "resources/*.yaml"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".venv", "data", "out", "notebooks"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pocket_atlas"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

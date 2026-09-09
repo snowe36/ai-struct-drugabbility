@@ -1,0 +1,39 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.DS_Store
+.env
+.idea/
+.vscode/
+
+# Downloaded structures, trajectories, model weights
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+artifacts/
+
+# Pipeline scratch (keep committed README figures)
+out/*
+!out/figures/
+out/figures/*
+!out/figures/.gitkeep
+!out/figures/*.png
+!out/*.md
+
+demo/scratch/
+demo/outputs/*
+!demo/outputs/.gitkeep
+
+# Optional heavy deps
+model/weights/
+*.xtc
+*.dcd
+*.trr
+*.h5
+*.hdf5
+*.tar.gz
