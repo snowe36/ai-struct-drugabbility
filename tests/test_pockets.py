@@ -111,6 +111,83 @@ def test_pocket_near_residues_requires_overlap():
     assert pocket_near_residues([pocket], {99, 100}, min_overlap=3) is None
 
 
+def test_ligand_include_shrinks_occupied_void():
+    """A HETATM in the void should survive exclude and shrink/kill include."""
+    atoms = []
+    res = 1
+    for x in range(-8, 9, 2):
+        for y in range(-8, 9, 2):
+            for z in range(-8, 9, 2):
+                if max(abs(x), abs(y), abs(z)) < 4:
+                    continue
+                if max(abs(x), abs(y), abs(z)) > 8:
+                    continue
+                atoms.append(_atom(res, float(x), float(y), float(z)))
+                res += 1
+    ligands = []
+    for x in range(-4, 5):
+        for y in range(-4, 5):
+            for z in range(-4, 5):
+                ligands.append(
+                    Atom(
+                        name="C1",
+                        resname="LIG",
+                        resseq=999,
+                        chain="A",
+                        coord=np.array([float(x), float(y), float(z)], dtype=float),
+                        element="C",
+                        is_het=True,
+                    )
+                )
+    structure = Structure(atoms=atoms + ligands, pdb_id="void")
+    excluded = detect_pockets(structure, ligand_mode="exclude", min_neighbors=12, min_points=6)
+    included = detect_pockets(structure, ligand_mode="include", min_neighbors=12, min_points=6)
+    assert excluded, "exclude mode should still see the empty void"
+    assert excluded[0].extra.get("ligand_mode") == "exclude"
+
+    def _near_origin(pockets):
+        for pocket in pockets:
+            if float(np.linalg.norm(pocket.centroid)) < 3.0:
+                return pocket
+        return None
+
+    assert _near_origin(excluded) is not None
+    # Occupied core: include must not report a void at the origin.
+    assert _near_origin(included) is None
+
+
+def test_horn_cluster_exists_and_is_not_the_chain():
+    """1BTL/1PZO: horn cluster exists, ligand-scale, not the whole protein."""
+    import pytest
+
+    from pocket_atlas.cases import load_case
+    from pocket_atlas.io.rcsb import load_structure
+    from pocket_atlas.pockets import DETECTOR_VERSION
+    from pocket_atlas.prepare import prepare_structure
+
+    assert DETECTOR_VERSION == "0.2.0"
+    case = load_case("tem1_horn")
+    try:
+        apo = prepare_structure(load_structure("1BTL"), chain="A")
+        holo = prepare_structure(load_structure("1PZO"), chain="A", keep_ligand="CBT")
+    except Exception as exc:
+        pytest.skip(f"RCSB 1BTL/1PZO unavailable: {exc}")
+
+    n_res = len(apo.residue_numbers(chain="A"))
+    assert n_res > 200
+    for tag, structure, mode in (("apo", apo, "exclude"), ("holo", holo, "exclude")):
+        pockets = detect_pockets(structure, chain="A", ligand_mode=mode)
+        site = pocket_near_residues(pockets, set(case.cryptic_residues))
+        assert site is not None, f"{tag}: horn cluster missing"
+        assert 200 < site.volume < 8000, f"{tag}: volume {site.volume} is not ligand-scale"
+        assert len(site.lining_residues) < n_res * 0.4, f"{tag}: lining is the chain"
+        assert site.extra.get("seed_clearance", 0) >= 2.6
+    included = detect_pockets(holo, chain="A", ligand_mode="include")
+    horn_incl = pocket_near_residues(included, set(case.cryptic_residues))
+    # Include is a different measurement, not a volume contest.
+    assert horn_incl is None or horn_incl.extra.get("ligand_mode") == "include"
+
+
 def test_pdb_parser_skips_altloc_b():
     from pocket_atlas.io.pdb import parse_pdb
 
