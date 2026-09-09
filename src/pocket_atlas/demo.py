@@ -13,7 +13,7 @@ def run_demo() -> None:
     campaigns = []
     for name in cases:
         print(f"running {name} …")
-        camp = run_campaign(name, prefer_dyna1=False)
+        camp = run_campaign(name, prefer_dyna1=False, prior="literature", both_holo_modes=False)
         write_campaign_json(camp)
         campaigns.append(camp)
         print(
