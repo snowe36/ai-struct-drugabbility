@@ -41,9 +41,9 @@ def _case_title(camp: Campaign) -> str:
 def fig_overlap_enrichment(campaigns: list[Campaign], path: Path | None = None) -> Path:
     """Hero: one panel per case so a 0.00 bar and an 8× control are both readable."""
     ensure_dirs()
-    path = path or (FIGURES / "fig4_overlap_enrichment.png")
+    path = path or (FIGURES / "fig1_overlap_enrichment.png")
     n = max(len(campaigns), 1)
-    fig, axes = plt.subplots(1, n, figsize=(3.54 * n, 3.8), dpi=200, sharey=True)
+    fig, axes = plt.subplots(1, n, figsize=(3.54 * n, 3.9), dpi=200, sharey=True)
     fig.patch.set_facecolor(FACE)
     if n == 1:
         axes = [axes]
@@ -51,7 +51,7 @@ def fig_overlap_enrichment(campaigns: list[Campaign], path: Path | None = None) 
     ymax = 1.4
     for camp in campaigns:
         ymax = max(ymax, camp.overlap.cryptic_enrichment, camp.overlap.control_enrichment)
-    ymax = ymax * 1.22
+    ymax = ymax * 1.28
 
     sources = []
     for ax, camp in zip(axes, campaigns, strict=True):
@@ -62,55 +62,74 @@ def fig_overlap_enrichment(campaigns: list[Campaign], path: Path | None = None) 
             f"{ov.cryptic_and_nmr}/{ov.n_cryptic}",
             f"{ov.control_and_nmr}/{ov.n_control}",
         ]
-        names = ["Cryptic\nlining", "Catalytic /\nnucleotide"]
+        names = ["Cryptic lining", "Catalytic / nucleotide"]
         colors = [TEAL, ACCENT]
-        bars = ax.bar(names, vals, color=colors, width=0.62, zorder=2)
+        ax.bar(range(2), vals, color=colors, width=0.62, zorder=2)
         ax.axhline(1.0, color=MUTED, ls="--", lw=1, zorder=1)
-        for bar, val, count in zip(bars, vals, counts, strict=True):
-            # Zero-height bars are invisible; keep a baseline tick + label.
-            y = val if val > 0.08 else 0.0
-            va = "bottom" if val > 0.08 else "bottom"
-            offset = 0.12 if val > 0.08 else 0.12
-            ax.text(
-                bar.get_x() + bar.get_width() / 2,
-                y + offset,
-                f"{val:.2f}\n({count})",
-                ha="center",
-                va=va,
-                color=TEXT,
-                fontsize=8,
-            )
+        trans = ax.get_xaxis_transform()  # data x, axes y
+        for i, (val, count) in enumerate(zip(vals, counts, strict=True)):
+            if val < 0.35:
+                ax.text(
+                    i,
+                    -0.14,
+                    f"{val:.2f} ({count})",
+                    transform=trans,
+                    ha="center",
+                    va="top",
+                    color=TEXT,
+                    fontsize=8,
+                    clip_on=False,
+                )
+            else:
+                pad = 0.38 if abs(val - 1.0) < 0.25 else 0.2
+                ax.text(
+                    i,
+                    val + pad,
+                    f"{val:.2f} ({count})",
+                    ha="center",
+                    va="bottom",
+                    color=TEXT,
+                    fontsize=8,
+                    zorder=3,
+                )
+        ax.set_xticks(range(2))
+        ax.set_xticklabels(names)
         ax.set_ylim(0, ymax)
         ax.set_title(_case_title(camp), color=TEXT, fontsize=11)
         _style(ax)
-        ax.tick_params(axis="x", labelsize=8)
+        ax.tick_params(axis="x", labelsize=8, pad=10)
 
     axes[0].set_ylabel("Enrichment vs protein background")
     fig.suptitle("Do NMR-timescale residues sit on cryptic sites?", color=TEXT, fontsize=12, y=1.02)
     prior = _prior_label(sources[0] if sources else "")
     extras = ""
     if len(set(sources)) > 1:
-        extras = "  ·  " + "; ".join(f"{_case_title(c)}: {_prior_label(c.overlap.source)}" for c in campaigns)
+        extras = "  ·  " + "; ".join(
+            f"{_case_title(c)}: {_prior_label(c.overlap.source)}" for c in campaigns
+        )
     fig.text(
         0.5,
         -0.04,
-        f"Prior: {prior}{extras}. Dashed line = no enrichment. "
-        "Numbers on bars: enrichment (NMR ∩ set / |set|).",
+        f"Prior: {prior}{extras}. Dashed line = no enrichment.",
         ha="center",
         color=MUTED,
         fontsize=8,
     )
     fig.tight_layout()
+    fig.subplots_adjust(bottom=0.22)
     fig.savefig(path, bbox_inches="tight", facecolor=FACE)
     plt.close(fig)
     return path
 
 
 def fig_apo_holo_volumes(campaign: Campaign, path: Path | None = None) -> Path:
-    """Apo vs holo matched-site clearance. Volume is annotation, not the claim."""
+    """Apo vs holo matched-site clearance. Volume sits under the state, not on the bar."""
     ensure_dirs()
-    path = path or (FIGURES / f"fig_{campaign.case.name}_apo_holo.png")
-    fig, ax = plt.subplots(figsize=(3.54, 3.4), dpi=200)
+    slug = "tem1" if campaign.case.name == "tem1_horn" else (
+        "kras" if campaign.case.name == "kras_switch2" else campaign.case.name
+    )
+    path = path or (FIGURES / f"fig_{slug}_clearance.png")
+    fig, ax = plt.subplots(figsize=(3.54, 3.5), dpi=200)
     fig.patch.set_facecolor(FACE)
     clears = []
     names = []
@@ -120,11 +139,14 @@ def fig_apo_holo_volumes(campaign: Campaign, path: Path | None = None) -> Path:
         clears.append(float(extra.get("seed_clearance", 0.0)))
         vols.append(arm.site_pocket.volume if arm.site_pocket else 0.0)
         names.append(arm.tag)
-    ax.bar(names, clears, color=[MUTED, TEAL])
+    ax.bar(names, clears, color=[MUTED, TEAL], width=0.55)
     ax.set_ylabel("Matched-site seed clearance (Å)")
-    ax.set_title(campaign.case.raw.get("title", campaign.case.name))
-    for i, (clr, vol) in enumerate(zip(clears, vols, strict=True)):
-        ax.text(i, clr + 0.05, f"{vol:.0f} Å³", ha="center", va="bottom", color=MUTED, fontsize=8)
+    ax.set_title(_case_title(campaign))
+    ticks = [f"{name}\n{vol:.0f} Å³" for name, vol in zip(names, vols, strict=True)]
+    ax.set_xticks(range(len(names)))
+    ax.set_xticklabels(ticks)
+    top = max(clears) if clears else 1.0
+    ax.set_ylim(0, top * 1.2)
     _style(ax)
     fig.tight_layout()
     fig.savefig(path, bbox_inches="tight", facecolor=FACE)
@@ -218,9 +240,14 @@ def fig_tractability_card(campaign: Campaign, path: Path | None = None) -> Path:
 
 def write_all_figures(campaigns: list[Campaign]) -> list[Path]:
     ensure_dirs()
-    paths = [fig_overlap_enrichment(campaigns)]
+    paths = [fig_overlap_enrichment(campaigns, path=FIGURES / "fig1_overlap_enrichment.png")]
+    clearance_names = {
+        "tem1_horn": FIGURES / "fig2_tem1_clearance.png",
+        "kras_switch2": FIGURES / "fig3_kras_clearance.png",
+    }
     for camp in campaigns:
-        paths.append(fig_apo_holo_volumes(camp))
+        dest = clearance_names.get(camp.case.name)
+        paths.append(fig_apo_holo_volumes(camp, path=dest))
         paths.append(fig_cartoon_trace(camp, which="holo"))
         paths.append(fig_tractability_card(camp))
     return paths

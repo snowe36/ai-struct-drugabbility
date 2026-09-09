@@ -81,15 +81,22 @@ More labels (P-loop plus switch) raise the background, so cryptic enrichment fal
 Headline geometry is **seed clearance**, not matched-site volume. Detector `0.2.0`: holo can be scored with the ligand **excluded** from the distance field (default; protein conformation) or **included** (ligand-occupied void). TEM-1 horn clearance still rises apo → holo (3.45 → 4.02 Å) in exclude mode; volume is not the claim.
 
 <p align="center">
-  <img src="out/figures/fig4_overlap_enrichment.png" alt="NMR enrichment in cryptic lining vs catalytic/nucleotide control" width="720"/>
+  <img src="out/figures/fig1_overlap_enrichment.png" alt="NMR enrichment in cryptic lining vs catalytic/nucleotide control" width="720"/>
 </p>
 
-<p align="center"><em>Figure 4. Enrichment of NMR-timescale residues in the cryptic lining versus the catalytic (TEM-1) or nucleotide (KRAS) site. Demo figure: literature prior. Caption every campaign figure as Dyna-1 vs literature when Dyna-1 scores exist; otherwise name the prior (literature or RelaxDB-CPMG).</em></p>
+<p align="center"><em>Figure 1. Enrichment of literature NMR-exchange residues in the cryptic lining versus the catalytic (TEM-1) or nucleotide (KRAS) site. Dashed line is no enrichment. TEM-1 cryptic overlap is 0/18; that is the measurement.</em></p>
 
 <p align="center">
-  <img src="out/figures/fig_tem1_horn_apo_holo.png" alt="TEM-1 matched-site volume apo vs holo" width="320"/>
-  <img src="out/figures/fig_kras_switch2_apo_holo.png" alt="KRAS matched-site volume apo vs holo" width="320"/>
+  <img src="out/figures/fig2_tem1_clearance.png" alt="TEM-1 horn apo vs holo seed clearance" width="320"/>
 </p>
+
+<p align="center"><em>Figure 2. TEM-1 horn matched-site seed clearance, apo <code>1BTL</code> vs holo <code>1PZO</code>. Bars are clearance; Å³ under each state is matched-site volume (secondary).</em></p>
+
+<p align="center">
+  <img src="out/figures/fig3_kras_clearance.png" alt="KRAS switch-II apo vs holo seed clearance" width="320"/>
+</p>
+
+<p align="center"><em>Figure 3. KRAS switch-II matched-site seed clearance, apo <code>5V9U</code> vs holo <code>6OIM</code>. Same encoding as Figure 2.</em></p>
 
 ---
 
