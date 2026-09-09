@@ -29,7 +29,7 @@ pocket-demo
 # or: bash demo/run_demo.sh
 ```
 
-Fetches TEM-1 (`1BTL`/`1PZO`) and KRAS (`5V9U`/`6OIM`) from RCSB, detects ligand-scale cavities, and scores literature NMR labels against cryptic lining vs the catalytic / nucleotide control.
+Fetches TEM-1 (`1BTL`/`1PZO`) and KRAS (`5V9U`/`6OIM`) from RCSB, detects ligand-scale cavities, and scores **literature** NMR labels (`--prior literature`) against cryptic lining vs the catalytic / nucleotide control. Official RelaxDB-CPMG labels are `--prior relaxdb` (offline; vendored). Dyna-1 is `--prior dyna1` and needs weights.
 
 Outputs: `out/overlap.md`, `out/figures/`.
 
@@ -68,17 +68,17 @@ Literature NMR labels (not Dyna-1 weights). Pocket volumes are ligand-scale empt
 | TEM-1 horn | 0/18 | **0.00** | 6/6 catalytic | 8.77 |
 | KRAS switch-II | 19/26 | **4.07** | 3/16 nucleotide | 1.04 |
 
-TEM-1: the horn lining is buried hydrophobic core, not the Ω-loop. Savard/Gagné μs–ms exchange is at the Ω-loop and active-site vicinity. Low cryptic enrichment is a result — NMR dynamics are a prior for *motion*, not a pocket oracle.
+TEM-1: the horn lining is buried hydrophobic core, not the Ω-loop. Savard/Gagné μs–ms exchange is at the Ω-loop and active-site vicinity. Low cryptic enrichment is a result — NMR dynamics are a prior for *motion*, not a pocket oracle. **RelaxDB-CPMG has no TEM-1 entry.** The Kern 2026 `BLAC_CPMG` sequence is Mtb BlaC (`P9WKD3`), not TEM-1 (`P62593`). Those labels are not mapped onto `1BTL`/`1PZO`.
 
-KRAS: switch-I/II carry the published μs–ms signal **and** line the sotorasib site. Enrichment here is the expected positive control for the same question.
+KRAS: switch-I/II carry the published μs–ms signal **and** line the sotorasib site. Enrichment here is the expected positive control for the same question. `--prior relaxdb` replaces the conservative YAML subset with the official KRAS_CPMG X/Y set (58 residues, including the P-loop).
 
-Matched-site volumes (protein conformation only; ligand atoms are not in the distance field): TEM-1 apo `1BTL` 1561 Å³ / holo `1PZO` 1161 Å³; KRAS apo `5V9U` 909 Å³ / holo `6OIM` 602 Å³. Holo is not automatically “more open.” Clearance at the TEM-1 horn seeds does increase (3.45 → 4.02 Å).
+Headline geometry is **seed clearance**, not matched-site volume. Detector `0.2.0`: holo can be scored with the ligand **excluded** from the distance field (default; protein conformation) or **included** (ligand-occupied void). TEM-1 horn clearance still rises apo → holo (3.45 → 4.02 Å) in exclude mode; volume is not the claim.
 
 <p align="center">
   <img src="out/figures/fig4_overlap_enrichment.png" alt="NMR enrichment in cryptic lining vs catalytic/nucleotide control" width="720"/>
 </p>
 
-<p align="center"><em>Figure 4. Enrichment of literature NMR-exchange residues in the cryptic lining versus the catalytic (TEM-1) or nucleotide (KRAS) site. Prior = curated labels, not Dyna-1 weights.</em></p>
+<p align="center"><em>Figure 4. Enrichment of NMR-timescale residues in the cryptic lining versus the catalytic (TEM-1) or nucleotide (KRAS) site. Demo figure: literature prior. Caption every campaign figure as Dyna-1 vs literature when Dyna-1 scores exist; otherwise name the prior (literature or RelaxDB-CPMG).</em></p>
 
 <p align="center">
   <img src="out/figures/fig_tem1_horn_apo_holo.png" alt="TEM-1 matched-site volume apo vs holo" width="320"/>
@@ -112,9 +112,10 @@ RCSB apo / holo crystals
 |-----|------|
 | `pocket-fetch` | Download case PDBs from RCSB |
 | `pocket-prepare` / `pocket-detect` | Apo/holo prepare + detect |
-| `pocket-overlap` | NMR ∩ cryptic vs control |
+| `pocket-overlap --prior {literature,relaxdb,dyna1}` | NMR ∩ cryptic vs control |
 | `pocket-dyna` | Optional Dyna-1 (fails closed without weights) |
-| `pocket-fetch-md --yes` | VP35 Zenodo (multi-GB; refused without `--yes`) |
+| `pocket-fetch-md --yes [--extract --analyze]` | VP35 Zenodo (multi-GB; refused without `--yes`) |
+| `pocket-md --extract/--analyze` | Stride + CA 225–295 occupancy (not in demo/CI) |
 | `pocket-report` / `pocket-figures` | Markdown + matplotlib |
 | `pocket-demo` | Five-minute path |
 
@@ -137,10 +138,12 @@ If weights are missing the command prints why and stops. The demo never pretends
 
 ```bash
 pip install -e ".[md]"
-pocket-fetch-md --yes
+pocket-fetch-md --yes --extract --analyze
+# or, if the tarball is already local:
+pocket-md --extract --archive data/raw/vp35/<tarball> --analyze
 ```
 
-Archives are multi-gigabyte. Occupancy vs the 225–295 CA distance is computed only when `mdtraj` can load frames. CI does not download this.
+Archives are multi-gigabyte. Extract uses a hard stride; occupancy is the 225–295 CA distance; lining overlap uses Dyna-1 when `data/processed/vp35_iid_dyna1.json` exists. Do not commit trajectories. CI does not download this.
 
 ---
 
@@ -157,11 +160,11 @@ Archives are multi-gigabyte. Occupancy vs the 225–295 CA distance is computed 
 
 ## Limitations
 
-- Literature NMR lists are conservative curated subsets, not the full RelaxDB dump
-- Dyna-1 is optional; captions must say when the prior is literature labels
-- Pocket volumes are a geometric analogue, not SiteMap Dscore
-- Detector reports ligand-scale cavities; it is not a licensed SiteMap replacement
-- Apo vs holo volume is not a crypticity oracle — TEM-1 holo clearance rises, volume does not
+- Literature NMR lists (`--prior literature`) are conservative YAML subsets so CI stays offline
+- RelaxDB-CPMG KRAS labels are vendored; TEM-1 is **not** in that set (`BLAC_CPMG` = Mtb BlaC)
+- Dyna-1 is optional; captions must say Dyna-1 vs literature
+- Headline geometry is seed clearance; volume is secondary
+- Detector `0.2.0` is frozen: ligand-scale local maxima, `exclude`/`include` holo modes
 - VP35 is download-gated; without the trajectory there is no MD claim
 - No docking, no FEP, no wet-lab activity
 
