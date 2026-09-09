@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from pocket_atlas.cases import Case
+from pocket_atlas.dynamics.labels import resolve_prior, relaxdb_residues
 
 
 @dataclass

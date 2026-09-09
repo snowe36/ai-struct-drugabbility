@@ -1,0 +1,162 @@
+source: WaymentSteeleLab/Dyna-1 data/RelaxDB_datasets/RelaxDB_CPMG_4jun2026.json
+zenodo: 10.5281/zenodo.20834076
+citation: Wayment-Steele, El Nesr, Kern et al. Nature 2026. Dyna-1 / RelaxDB-CPMG.
+exchange_letters:
+- X
+- Y
+note: X = Rex criteria, Y = unsuppressed R2 (Hugging Face gelnesr/RelaxDB vocab). BLAC_CPMG is M. tuberculosis
+  BlaC (P9WKD3), not E. coli TEM-1 (P62593). Do not map BLAC labels onto 1BTL/1PZO.
+entries:
+  KRAS_CPMG:
+    entry_id: KRAS_CPMG
+    name: null
+    uniprot: null
+    seq_len: 169
+    sequence: MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHHYREQIKRVKDSEDVPMVLVGNKCDLPSRTVDTKQAQDLARSYGIPFIETSAKTRQGVDDAFYTLVREIRKHKEK
+    label: AAAAAXAXXAXXXXAXXAAXXAXAAXAAXXXNXPYXXXXXAAXAXAXAAAXXAXNXXXXXXXX.NXXXXXXNXXXAAAXAAAAAAANAAAAXXAXAXXAAXXXAAAAAAPAXAAANAAAAPAAAAAAAAAAAAAAAAAAPAAAXAAAAXAAAAAAAAAAAAAAAAAAAA
+    exchange_residues:
+    - 6
+    - 8
+    - 9
+    - 11
+    - 12
+    - 13
+    - 14
+    - 16
+    - 17
+    - 20
+    - 21
+    - 23
+    - 26
+    - 29
+    - 30
+    - 31
+    - 33
+    - 35
+    - 36
+    - 37
+    - 38
+    - 39
+    - 40
+    - 43
+    - 45
+    - 47
+    - 51
+    - 52
+    - 54
+    - 56
+    - 57
+    - 58
+    - 59
+    - 60
+    - 61
+    - 62
+    - 63
+    - 66
+    - 67
+    - 68
+    - 69
+    - 70
+    - 71
+    - 73
+    - 74
+    - 75
+    - 79
+    - 92
+    - 93
+    - 95
+    - 97
+    - 98
+    - 101
+    - 102
+    - 103
+    - 112
+    - 144
+    - 149
+    label_counts:
+      A: 100
+      X: 57
+      N: 6
+      P: 4
+      Y: 1
+      .: 1
+    data_origin: ''
+    case: kras_switch2
+    numbering: sequence index == KRAS residue number (Met1 = 1)
+  BLAC_CPMG:
+    entry_id: BLAC_CPMG
+    name: BLAC
+    uniprot: P9WKD3
+    seq_len: 266
+    sequence: GDLADRFAELERRYDARLGVYVPATGTTAAIEYRADERFAFCSTFKAPLVAAVLHQNPLTHLDKLITYTSDDIRSISPVAQQHVQTGMTIGQLCDAAIRYSDGTAANLLLADLGGPGGGTAAFTGYLRSLGDTVSRLDAEEPELNRDPPGDERDTTTPHAIALVLQQLVLGNALPPDKRALLTDWMARNTTGAKRIRAGFPADWKVIDKTGTGDYGRANDIAVVWSPTGVPYVVAVMSDRAGGGYDAEPREALLAEAATCVAGVLA
+    label: ..AAAAAAAANAAAAAAAAAAAPANYAAAAAAAAAAAAXAXX.XXAAPXAAAAAYAAPYYAAAAAAAXYAAAAXAYYPAAAAAAAAAAAAANAAAAXXXA.XXYAAAAAAAANAXPYAXNAAAAAAAAAAAAAAXXAYXXXPXAXXAPPNXAAXAAAPAAAAAAAAAAAAAYAAPPAAAAAAAAAAXAAXXXXAAXYAAXPAAAAAAXN.X.XAAAXXAXAXAAXAPAAAPAAAAAAAXAAAAAAXAAPXAAAAAAAAAAAAAAAA
+    exchange_residues:
+    - 26
+    - 39
+    - 41
+    - 42
+    - 44
+    - 45
+    - 49
+    - 55
+    - 59
+    - 60
+    - 68
+    - 69
+    - 74
+    - 76
+    - 77
+    - 97
+    - 98
+    - 99
+    - 102
+    - 103
+    - 104
+    - 115
+    - 117
+    - 119
+    - 135
+    - 136
+    - 138
+    - 139
+    - 140
+    - 141
+    - 143
+    - 145
+    - 146
+    - 151
+    - 154
+    - 172
+    - 187
+    - 190
+    - 191
+    - 192
+    - 193
+    - 196
+    - 197
+    - 200
+    - 208
+    - 211
+    - 213
+    - 217
+    - 218
+    - 220
+    - 222
+    - 225
+    - 239
+    - 246
+    - 250
+    label_counts:
+      .: 6
+      A: 183
+      N: 7
+      P: 15
+      Y: 12
+      X: 43
+    data_origin: Rex labels were assigned  > 2 Hz from 850 Hz data (see BLAC_CPMG.xlsx)
+    case: null
+    numbering: BlaC sequence index, not TEM-1 Ambler
+case_map:
+  kras_switch2: KRAS_CPMG
+  tem1_horn: null
+  vp35_iid: null

@@ -1,14 +1,17 @@
 """Optional Dyna-1 inference.
 
-Dyna-1 (Wayment-Steele / Kern 2026) predicts per-residue p(μs–ms exchange).
-It does not generate MD. Weights live on Hugging Face (gelnesr/Dyna-1).
-When they are missing we refuse to fake scores and fall back to curated
-NMR labels in the case YAML.
+Upstream CLI (WaymentSteeleLab/Dyna-1 `dyna1.py`):
+  python dyna1.py --pdb PATH --chain A --name NAME --use_pdb_seq --write_to_pdb --save_dir DIR
+
+Writes `{name}-Dyna1.csv` (position, residue, p_exchange) and `{name}-Dyna1.pdb`.
+Must run with cwd = the Dyna-1 repo so configs/esm3.yml and model/weights resolve.
+Set DYNA1_ROOT if the CLI is not already launched from that tree.
 """
 
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 from pocket_atlas.paths import PROCESSED, ensure_dirs
@@ -40,13 +43,9 @@ def save_scores(case_name: str, scores: dict[int, float]) -> Path:
 def high_exchange_residues(scores: dict[int, float], quantile: float = 0.8) -> set[int]:
     if not scores:
         return set()
-    values = np_values(scores)
+    values = list(scores.values())
     cutoff = _quantile(values, quantile)
     return {r for r, p in scores.items() if p >= cutoff}
-
-
-def np_values(scores: dict[int, float]) -> list[float]:
-    return list(scores.values())
 
 
 def _quantile(values: list[float], q: float) -> float:
@@ -57,60 +56,65 @@ def _quantile(values: list[float], q: float) -> float:
     return s[idx]
 
 
-def try_dyna1_inference(pdb_path: Path, chain: str = "A") -> dict[int, float]:
-    """Run Dyna-1 if the optional extra and weights are installed.
-
-    We shell out to the upstream CLI when `dyna1.py` is on PATH. This repo
-    does not vendor ESM-3.
-    """
+def try_dyna1_inference(pdb_path: Path, chain: str = "A", name: str | None = None) -> dict[int, float]:
     import shutil
     import subprocess
 
     dyna = shutil.which("dyna1.py") or shutil.which("dyna1")
     if dyna is None:
         raise Dyna1Unavailable(
-            "Dyna-1 CLI not found. Install WaymentSteeleLab/Dyna-1 and weights, "
-            "or rely on curated NMR labels (default)."
+            "Dyna-1 CLI not found. Install WaymentSteeleLab/Dyna-1 and gelnesr/Dyna-1 "
+            "weights, or use --prior literature / relaxdb."
         )
+    name = name or pdb_path.stem
     out_dir = PROCESSED / "dyna1_run"
     out_dir.mkdir(parents=True, exist_ok=True)
     cmd = [
         dyna,
         "--pdb",
-        str(pdb_path),
+        str(Path(pdb_path).resolve()),
         "--chain",
         chain,
         "--name",
-        pdb_path.stem,
+        name,
         "--use_pdb_seq",
         "--write_to_pdb",
+        "--save_dir",
+        str(out_dir),
     ]
-    subprocess.run(cmd, check=True, cwd=out_dir)
-    scored = out_dir / f"{pdb_path.stem}.pdb"
-    if not scored.exists():
-        raise Dyna1Unavailable("Dyna-1 ran but did not write a scored PDB")
-    return _bfactors_as_scores(scored, chain=chain)
+    cwd = os.environ.get("DYNA1_ROOT") or str(out_dir)
+    subprocess.run(cmd, check=True, cwd=cwd)
+    csv_path = out_dir / f"{name}-Dyna1.csv"
+    if csv_path.exists():
+        return _scores_from_csv(csv_path)
+    scored = out_dir / f"{name}-Dyna1.pdb"
+    if scored.exists():
+        return _bfactors_as_scores(scored, chain=chain)
+    raise Dyna1Unavailable(f"Dyna-1 ran but did not write {name}-Dyna1.csv or .pdb")
+
+
+def _scores_from_csv(path: Path) -> dict[int, float]:
+    scores: dict[int, float] = {}
+    for i, line in enumerate(path.read_text().splitlines()):
+        if i == 0 and "p_exchange" in line:
+            continue
+        parts = [p.strip() for p in line.split(",")]
+        if len(parts) < 3:
+            continue
+        scores[int(float(parts[0]))] = float(parts[2])
+    if not scores:
+        raise Dyna1Unavailable(f"no p_exchange rows in {path}")
+    return scores
 
 
 def _bfactors_as_scores(path: Path, chain: str) -> dict[int, float]:
-    from pocket_atlas.io.pdb import read_pdb
-
-    structure = read_pdb(path)
     scores: dict[int, float] = {}
-    # Upstream writes p(exchange) into B-factors; we re-parse as occupancy-like.
-    text = path.read_text()
-    for line in text.splitlines():
+    for line in path.read_text().splitlines():
         if not line.startswith("ATOM"):
             continue
         if line[21].strip() != chain:
             continue
         if line[12:16].strip() != "CA":
             continue
-        resseq = int(line[22:26])
-        bfactor = float(line[60:66])
-        scores[resseq] = bfactor
-    if not scores:
-        for atom in structure.protein_atoms(chain=chain):
-            if atom.name == "CA":
-                scores[atom.resseq] = 0.0
+        scores[int(line[22:26])] = float(line[60:66])
     return scores

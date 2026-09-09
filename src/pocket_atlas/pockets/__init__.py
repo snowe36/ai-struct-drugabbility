@@ -17,6 +17,8 @@ from scipy.spatial import cKDTree
 
 from pocket_atlas.io.pdb import Atom, Structure
 
+DETECTOR_VERSION = "0.2.0"
+
 KYTE_DOOLITTLE = {
     "ILE": 4.5, "VAL": 4.2, "LEU": 3.8, "PHE": 2.8, "CYS": 2.5, "MET": 1.9,
     "ALA": 1.8, "GLY": -0.4, "THR": -0.7, "SER": -0.8, "TRP": -0.9,
@@ -82,8 +84,21 @@ def detect_pockets(
     min_neighbors: int = 16,
     min_points: int = 10,
     lining_cutoff: float = 4.5,
+    ligand_mode: str = "exclude",
 ) -> list[Pocket]:
-    atoms = structure.protein_atoms(chain=chain, heavy=True)
+    """ligand_mode: exclude = protein only; include = protein + HETATMs in the field."""
+    if ligand_mode not in {"exclude", "include"}:
+        raise ValueError(f"ligand_mode must be exclude|include, got {ligand_mode!r}")
+    protein = structure.protein_atoms(chain=chain, heavy=True)
+    if ligand_mode == "include":
+        ligands = [
+            a
+            for a in structure.atoms
+            if a.is_het and a.element != "H" and (chain is None or a.chain == chain)
+        ]
+        atoms = protein + ligands
+    else:
+        atoms = protein
     if len(atoms) < 10:
         return []
     coords = structure.coords(atoms)
@@ -133,8 +148,8 @@ def detect_pockets(
             continue
         volume = float(len(pts) * grid**3)
         centroid = pts.mean(axis=0)
-        lining = _lining_residues(atoms, pts, cutoff=lining_cutoff)
-        hyd, pol = _lining_chemistry(atoms, lining)
+        lining = _lining_residues(protein, pts, cutoff=lining_cutoff)
+        hyd, pol = _lining_chemistry(protein, lining)
         r_max = float(np.max(np.linalg.norm(members - members.mean(axis=0), axis=1))) if len(members) > 1 else 0.0
         pockets.append(
             Pocket(
@@ -151,6 +166,8 @@ def detect_pockets(
                     "n_spheres": int(len(members)),
                     "seed_clearance": seed_clearance,
                     "cluster_span": r_max,
+                    "ligand_mode": ligand_mode,
+                    "detector_version": DETECTOR_VERSION,
                 },
             )
         )
