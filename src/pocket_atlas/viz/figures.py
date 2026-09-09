@@ -48,11 +48,15 @@ def fig_overlap_enrichment(campaigns: list[Campaign], path: Path | None = None) 
     ax.set_title("Do NMR-timescale residues sit on cryptic sites?")
     ax.legend(frameon=False, loc="upper right")
     _style(ax)
-    source = sources[0] if sources else ""
+    source = ", ".join(dict.fromkeys(sources)) if sources else ""
+    label = "Dyna-1" if source == "dyna1" else (
+        "RelaxDB-CPMG" if source == "relaxdb_cpmg" else "literature NMR"
+    )
     ax.text(
         0.0,
         -0.22,
-        f"Prior: {source}. Enrichment = (NMR ∩ set) / |set|, divided by NMR fraction in the chain.",
+        f"Prior: {label} ({source}). Caption: Dyna-1 vs literature when both exist; "
+        "else the named prior. Enrichment = (prior ∩ set) / |set| / background.",
         transform=ax.transAxes,
         color=MUTED,
         fontsize=8,
@@ -64,19 +68,24 @@ def fig_overlap_enrichment(campaigns: list[Campaign], path: Path | None = None) 
 
 
 def fig_apo_holo_volumes(campaign: Campaign, path: Path | None = None) -> Path:
+    """Apo vs holo matched-site clearance. Volume is annotation, not the claim."""
     ensure_dirs()
     path = path or (FIGURES / f"fig_{campaign.case.name}_apo_holo.png")
     fig, ax = plt.subplots(figsize=(3.54, 3.4), dpi=200)
     fig.patch.set_facecolor(FACE)
-    vols = []
+    clears = []
     names = []
-    for arm, _color in ((campaign.apo, MUTED), (campaign.holo, TEAL)):
-        vol = arm.site_pocket.volume if arm.site_pocket else 0.0
-        vols.append(vol)
+    vols = []
+    for arm in (campaign.apo, campaign.holo):
+        extra = arm.site_pocket.extra if arm.site_pocket else {}
+        clears.append(float(extra.get("seed_clearance", 0.0)))
+        vols.append(arm.site_pocket.volume if arm.site_pocket else 0.0)
         names.append(arm.tag)
-    ax.bar(names, vols, color=[MUTED, TEAL])
-    ax.set_ylabel("Matched-site volume (Å³)")
+    ax.bar(names, clears, color=[MUTED, TEAL])
+    ax.set_ylabel("Matched-site seed clearance (Å)")
     ax.set_title(campaign.case.raw.get("title", campaign.case.name))
+    for i, (clr, vol) in enumerate(zip(clears, vols, strict=True)):
+        ax.text(i, clr + 0.05, f"{vol:.0f} Å³", ha="center", va="bottom", color=MUTED, fontsize=8)
     _style(ax)
     fig.tight_layout()
     fig.savefig(path, bbox_inches="tight", facecolor=FACE)
@@ -138,14 +147,18 @@ def fig_tractability_card(campaign: Campaign, path: Path | None = None) -> Path:
     ov = campaign.overlap
     apo_vol = campaign.apo.site_pocket.volume if campaign.apo.site_pocket else 0.0
     holo_vol = campaign.holo.site_pocket.volume if campaign.holo.site_pocket else 0.0
+    apo_clr = campaign.extra.get("apo_clearance", 0.0)
+    holo_clr = campaign.extra.get("holo_clearance", 0.0)
     lines = [
         campaign.case.raw.get("title", campaign.case.name),
-        f"Apo site recovered: {'yes' if campaign.cryptic_in_apo else 'no'}  ({apo_vol:.0f} Å³)",
-        f"Holo site recovered: {'yes' if campaign.cryptic_in_holo else 'no'}  ({holo_vol:.0f} Å³)",
+        f"Apo site: {'yes' if campaign.cryptic_in_apo else 'no'}  "
+        f"clearance {apo_clr:.2f} Å  ({apo_vol:.0f} Å³)",
+        f"Holo site: {'yes' if campaign.cryptic_in_holo else 'no'}  "
+        f"clearance {holo_clr:.2f} Å  ({holo_vol:.0f} Å³)",
         f"NMR ∩ cryptic lining: {ov.cryptic_and_nmr}/{ov.n_cryptic}",
         f"NMR ∩ control site:   {ov.control_and_nmr}/{ov.n_control}",
         f"Cryptic enrichment: {ov.cryptic_enrichment:.2f}   control: {ov.control_enrichment:.2f}",
-        f"Prior: {ov.source}",
+        f"Prior: {ov.source}  ·  Dyna-1 vs literature",
     ]
     fig, ax = plt.subplots(figsize=(3.54, 3.2), dpi=200)
     fig.patch.set_facecolor(FACE)
