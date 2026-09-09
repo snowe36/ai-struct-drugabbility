@@ -1,12 +1,6 @@
 # Pocket Atlas
 
-**NMR-timescale dynamics as a prior for cryptic ligandable sites**
-
-*Dyna-1 says where the protein moves. It does not say the protein opened a pocket.*
-
-> The question is not “run MD until a cavity appears.” It is whether residues that exchange on the μs–ms NMR timescale spatially coincide with cryptic ligandable sites more than with the catalytic / nucleotide site.
-
-Repo: [github.com/snowe36/ai-struct-drugabbility](https://github.com/snowe36/ai-struct-drugabbility)
+**Using NMR-timescale dynamics to prioritize cryptic ligandable pockets**
 
 [![CI](https://github.com/snowe36/ai-struct-drugabbility/actions/workflows/ci.yml/badge.svg)](https://github.com/snowe36/ai-struct-drugabbility/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -14,11 +8,51 @@ Repo: [github.com/snowe36/ai-struct-drugabbility](https://github.com/snowe36/ai-
 [![Demo](https://img.shields.io/badge/demo-5%20min-5FA8A8.svg)](demo/)
 [![Citation](https://img.shields.io/badge/CITATION-cff-E9C46A.svg)](CITATION.cff)
 
+Repo: [github.com/snowe36/ai-struct-drugabbility](https://github.com/snowe36/ai-struct-drugabbility)
+
+<p align="center">
+  <img src="out/figures/fig1_overlap_enrichment.png" alt="NMR enrichment in cryptic lining vs catalytic/nucleotide control" width="720"/>
+</p>
+
+<p align="center"><em>Figure 1. Literature NMR-exchange residues enrich in the KRAS switch-II lining (19/26, 4.07×) and not in the TEM-1 horn (0/18, 0.00×). Dashed line is no enrichment versus protein background.</em></p>
+
+*Dyna-1 says where the protein moves. It does not say the protein opened a pocket.*
+
+---
+
+## What this asks
+
+Cryptic pockets are attractive drug-discovery targets because they can provide ligandable sites outside conserved functional pockets. The challenge is that experimentally observed protein dynamics do not necessarily correspond to pocket opening. Pocket Atlas tests whether NMR-timescale dynamics can be used as a spatial prior for locating such sites.
+
+**Cryptic site:** a ligandable pocket that is poorly accessible or poorly formed in the reference apo structure but becomes accessible or stabilized in an alternative protein conformation.
+
+The detector reports ligand-scale cavities and their residue lining. Overlap then asks whether μs–ms NMR-dynamic residues sit on that lining more than on the catalytic / nucleotide control.
+
+---
+
+## Key result
+
+In KRAS, published μs–ms NMR dynamics substantially overlap the switch-II cryptic pocket, whereas the TEM-1 horn provides a negative case. Dynamics are a prior for pocket localization, not evidence that a pocket opened.
+
+| Case | NMR ∩ cryptic | Cryptic enrichment | NMR ∩ control | Control enrichment |
+|------|---------------|--------------------|---------------|--------------------|
+| KRAS switch-II | **19/26** | **4.07×** | 3/16 nucleotide | 1.04× |
+| TEM-1 horn | **0/18** | **0.00×** | 6/6 catalytic | 8.77× |
+
+`--prior relaxdb` replaces the conservative KRAS YAML subset with the official RelaxDB-CPMG X/Y set (58 residues, including the P-loop): **19/26**, **2.10×** cryptic; 7/16 nucleotide, 1.26×. More labels raise the background, so enrichment falls. TEM-1 stays on literature NMR: RelaxDB-CPMG has no TEM-1 entry (`BLAC_CPMG` is Mtb BlaC, `P9WKD3`, not TEM-1 `P62593`).
+
+TEM-1 horn lining is buried hydrophobic core, not the Ω-loop. Savard & Gagné μs–ms exchange sits at the Ω-loop and active-site vicinity — so zero cryptic overlap is the measurement. KRAS switch-I/II carry both the published exchange and the sotorasib lining.
+
+<p align="center">
+  <img src="out/figures/fig_kras_switch2_holo_trace.png" alt="KRAS holo Cα trace: NMR and switch-II lining overlap" width="360"/>
+  <img src="out/figures/fig_tem1_horn_holo_trace.png" alt="TEM-1 holo Cα trace: NMR and horn lining do not overlap" width="360"/>
+</p>
+
+<p align="center"><em>Figure 2. Cα traces on the holo crystals. Coral = cryptic lining ∩ NMR. KRAS switch-II is a coral cluster; TEM-1 horn (teal) is spatially separate from Ω-loop / active-site exchange (peach).</em></p>
+
 ---
 
 ## 5-minute demo
-
-No Dyna-1 weights, no Folding@home, no Zenodo tarball:
 
 ```bash
 git clone https://github.com/snowe36/ai-struct-drugabbility.git
@@ -29,96 +63,26 @@ pocket-demo
 # or: bash demo/run_demo.sh
 ```
 
-Fetches TEM-1 (`1BTL`/`1PZO`) and KRAS (`5V9U`/`6OIM`) from RCSB, detects ligand-scale cavities, and scores **literature** NMR labels (`--prior literature`) against cryptic lining vs the catalytic / nucleotide control. Official RelaxDB-CPMG labels are `--prior relaxdb` (offline; vendored). Dyna-1 is `--prior dyna1` and needs weights.
+Fetches TEM-1 (`1BTL`/`1PZO`) and KRAS (`5V9U`/`6OIM`) from RCSB, detects ligand-scale cavities, and scores literature NMR labels (`--prior literature`) against cryptic lining vs the catalytic / nucleotide control. Official RelaxDB-CPMG labels are `--prior relaxdb` (offline; vendored). Dyna-1 is `--prior dyna1` and needs weights.
 
 Outputs: `out/overlap.md`, `out/figures/`.
 
----
-
-## The question
-
-**Do NMR-timescale dynamic residues sit on cryptic ligandable sites more than on the obvious functional site?**
-
-Dyna-1 (Wayment-Steele, Kern *et al.*, *Nature* 2026) predicts per-residue *p*(μs–ms exchange) from what is missing in BMRB assignment tables. It tracks RelaxDB / CPMG. It does **not** emit trajectories.
-
-Short public MD (ATLAS / mdCATH, ~100 ns) is the wrong ensemble for cryptic opening. This repo does not use it as evidence. The long-MD arm is public VP35 FAST+FAH (~125 μs, Zenodo [15854842](https://zenodo.org/records/15854842)), opt-in, never downloaded by the demo.
-
-This is not SiteMap, not Desmond, not Glide, not FEP. Geometric pockets here are a documented analogue of a buried-void scan. Prep is heavy-atom cleanup, not Prime.
+Requires **Python 3.11+**. RCSB must be reachable for the first fetch; afterward PDBs live in `data/raw/` (gitignored).
 
 ---
 
-## Three arms
-
-| Arm | Role | Data |
-|-----|------|------|
-| **TEM-1 horn** | Cryptic allosteric pocket ~16 Å from Ser70 | Apo `1BTL` vs CBT holo `1PZO` (Horn & Shoichet 2004). NMR: Savard & Gagné 2006; RelaxDB-CPMG BLAC |
-| **KRAS switch-II** | Oral small-molecule cryptic site | G12C·GDP `5V9U` vs sotorasib `6OIM`. NMR: switch-I/II CPMG / RelaxDB KRAS |
-| **VP35 IID** | Long public MD that actually opens | Bowman FAST+FAH, CV residues 225–295. Multi-GB. `pocket-fetch-md --yes` only |
-
-L99A T4 lysozyme is a cavity-creating mutant, not a cryptic site. It is not a campaign arm.
-
----
-
-## Demo result
-
-Literature NMR labels (not Dyna-1 weights). Pocket volumes are ligand-scale empty-sphere clusters, not the protein interior.
-
-| Case | NMR ∩ cryptic | Cryptic enrichment | NMR ∩ control | Control enrichment |
-|------|---------------|--------------------|---------------|--------------------|
-| TEM-1 horn | 0/18 | **0.00** | 6/6 catalytic | 8.77 |
-| KRAS switch-II | 19/26 | **4.07** | 3/16 nucleotide | 1.04 |
-
-TEM-1: the horn lining is buried hydrophobic core, not the Ω-loop. Savard/Gagné μs–ms exchange is at the Ω-loop and active-site vicinity. Low cryptic enrichment is a result — NMR dynamics are a prior for *motion*, not a pocket oracle. **RelaxDB-CPMG has no TEM-1 entry.** The Kern 2026 `BLAC_CPMG` sequence is Mtb BlaC (`P9WKD3`), not TEM-1 (`P62593`). Those labels are not mapped onto `1BTL`/`1PZO`.
-
-KRAS: switch-I/II carry the published μs–ms signal **and** line the sotorasib site. Enrichment here is the expected positive control for the same question. `--prior relaxdb` replaces the conservative YAML subset with the official KRAS_CPMG X/Y set (58 residues, including the P-loop):
-
-| Case | Prior | ∩ cryptic | Cryptic enrichment | ∩ control | Control enrichment |
-|------|-------|-----------|--------------------|-----------|--------------------|
-| KRAS switch-II | RelaxDB-CPMG | 19/26 | **2.10** | 7/16 nucleotide | 1.26 |
-
-More labels (P-loop plus switch) raise the background, so cryptic enrichment falls versus the curated subset. That is the actual-label result, not a bug. TEM-1 stays on literature: there is no TEM-1 row in RelaxDB-CPMG.
-
-Headline geometry is **seed clearance**, not matched-site volume. Detector `0.2.0`: holo can be scored with the ligand **excluded** from the distance field (default; protein conformation) or **included** (ligand-occupied void). TEM-1 horn clearance still rises apo → holo (3.45 → 4.02 Å) in exclude mode; volume is not the claim.
-
-<p align="center">
-  <img src="out/figures/fig1_overlap_enrichment.png" alt="NMR enrichment in cryptic lining vs catalytic/nucleotide control" width="720"/>
-</p>
-
-<p align="center"><em>Figure 1. Enrichment of literature NMR-exchange residues in the cryptic lining versus the catalytic (TEM-1) or nucleotide (KRAS) site. Dashed line is no enrichment. TEM-1 cryptic overlap is 0/18; that is the measurement.</em></p>
-
-<p align="center">
-  <img src="out/figures/fig2_tem1_clearance.png" alt="TEM-1 horn apo vs holo seed clearance" width="320"/>
-</p>
-
-<p align="center"><em>Figure 2. TEM-1 horn matched-site seed clearance, apo <code>1BTL</code> vs holo <code>1PZO</code>. Bars are clearance; Å³ under each state is matched-site volume (secondary).</em></p>
-
-<p align="center">
-  <img src="out/figures/fig3_kras_clearance.png" alt="KRAS switch-II apo vs holo seed clearance" width="320"/>
-</p>
-
-<p align="center"><em>Figure 3. KRAS switch-II matched-site seed clearance, apo <code>5V9U</code> vs holo <code>6OIM</code>. Same encoding as Figure 2.</em></p>
-
----
-
-## Workflow
+## How it works
 
 ```text
-RCSB apo / holo crystals
-        │
-        ▼
- Prepare (drop waters / unused HET; keep the holo ligand in the PDB)
-        │
-        ▼
- Ligand-scale pocket detect (local maxima of clearance, 2.6–5 Å)
-        │
-        ▼
- Match pocket to YAML cryptic lining
-        │
-        ▼
- NMR / Dyna-1 residue prior
-        │
-        ▼
- Overlap vs cryptic lining and vs catalytic/nucleotide control
+apo / holo crystals
+        ↓
+ligand-scale pocket detection
+        ↓
+NMR / Dyna-1 residue prior
+        ↓
+cryptic lining vs catalytic / nucleotide control
+        ↓
+overlap + enrichment
 ```
 
 | CLI | Role |
@@ -128,13 +92,48 @@ RCSB apo / holo crystals
 | `pocket-overlap --prior {literature,relaxdb,dyna1}` | NMR ∩ cryptic vs control |
 | `pocket-dyna` | Optional Dyna-1 (fails closed without weights) |
 | `pocket-fetch-md --yes [--extract --analyze]` | VP35 Zenodo (multi-GB; refused without `--yes`) |
-| `pocket-md --extract/--analyze` | Stride + CA 225–295 occupancy (not in demo/CI) |
+| `pocket-md --extract/--analyze` | Stride + CA 225–295 occupancy |
 | `pocket-report` / `pocket-figures` | Markdown + matplotlib |
 | `pocket-demo` | Five-minute path |
 
 ---
 
+## Benchmark cases
+
+| Case | Role | Data |
+|------|------|------|
+| **TEM-1 horn** | Negative case: cryptic allosteric pocket ~16 Å from Ser70 | Apo `1BTL` vs CBT holo `1PZO` (Horn & Shoichet 2004). NMR: Savard & Gagné 2006 |
+| **KRAS switch-II** | Positive case: oral small-molecule cryptic site | G12C·GDP `5V9U` vs sotorasib `6OIM`. NMR: switch-I/II CPMG / RelaxDB KRAS |
+| **VP35 IID** | Optional long public MD that opens | Bowman FAST+FAH, CV residues 225–295. `pocket-fetch-md --yes` only |
+
+---
+
+## What the demo actually measures
+
+The detector finds **ligand-scale local maxima of atomic clearance** (empty-sphere clusters in a ~2.6–5 Å band) and reports the residues that line them. YAML `cryptic_site` lists are the published lining of each known cryptic pocket, not whatever cavity scored highest.
+
+Overlap is residue-set geometry:
+
+- **NMR ∩ cryptic** — how many cryptic-lining residues are in the NMR-exchange set
+- **Enrichment** — (NMR fraction in the lining) / (NMR fraction in the protein)
+- **Control** — the catalytic site (TEM-1) or nucleotide site (KRAS)
+
+Headline apo/holo geometry is **seed clearance**, not matched-site volume. TEM-1 horn clearance rises 3.45 → 4.02 Å (`1BTL` → `1PZO`); KRAS switch-II 4.21 → 4.40 Å (`5V9U` → `6OIM`).
+
+Literature NMR lists (`--prior literature`) are conservative YAML subsets so CI stays offline. Captions must say which prior was used.
+
+<p align="center">
+  <img src="out/figures/fig3_kras_clearance.png" alt="KRAS switch-II apo vs holo seed clearance" width="320"/>
+  <img src="out/figures/fig2_tem1_clearance.png" alt="TEM-1 horn apo vs holo seed clearance" width="320"/>
+</p>
+
+<p align="center"><em>Figure 3. Matched-site seed clearance, apo vs holo. Å³ under each bar is matched-site volume (secondary).</em></p>
+
+---
+
 ## Optional Dyna-1
+
+Dyna-1 (Wayment-Steele, Kern *et al.*, *Nature* 2026) predicts per-residue *p*(μs–ms exchange) from missing BMRB assignment-table information. It tracks RelaxDB / CPMG.
 
 Weights: Hugging Face [`gelnesr/Dyna-1`](https://huggingface.co/gelnesr/Dyna-1). Code: [WaymentSteeleLab/Dyna-1](https://github.com/WaymentSteeleLab/Dyna-1).
 
@@ -143,11 +142,13 @@ pip install -e ".[dyna]"
 pocket-dyna --case tem1_horn --pdb data/processed/tem1_horn_apo_1BTL.pdb
 ```
 
-If weights are missing the command prints why and stops. The demo never pretends to have run Dyna-1.
+If weights are missing the command prints why and stops.
 
 ---
 
-## VP35 (not in the demo)
+## Long-timescale MD
+
+Short public MD (~100 ns) is the wrong ensemble for cryptic opening. The long-MD path is public VP35 FAST+FAH (~125 μs, Zenodo [15854842](https://zenodo.org/records/15854842)):
 
 ```bash
 pip install -e ".[md]"
@@ -156,30 +157,23 @@ pocket-fetch-md --yes --extract --analyze
 pocket-md --extract --archive data/raw/vp35/<tarball> --analyze
 ```
 
-Archives are multi-gigabyte. Extract uses a hard stride; occupancy is the 225–295 CA distance; lining overlap uses Dyna-1 when `data/processed/vp35_iid_dyna1.json` exists. Do not commit trajectories. CI does not download this.
+Archives are multi-gigabyte. Extract uses a hard stride; occupancy is the 225–295 CA distance; lining overlap uses Dyna-1 when `data/processed/vp35_iid_dyna1.json` exists. Do not commit trajectories. The five-minute demo does not download this.
 
 ---
 
-## Schrödinger mapping (v0)
+## Scope
 
-| They have | This repo |
-|-----------|-----------|
-| Desmond | Not here. Dyna-1 ≠ MD. VP35 FAH is the long-MD analogue |
-| SiteMap | Geometric empty-sphere clusters (`pocket_atlas.pockets`) |
-| Prime | Heavy-atom prepare, optional OpenMM later |
-| Glide / FEP | Out of v0 |
+Pocket Atlas is a geometric / NMR-prior analysis framework, not a molecular-docking or free-energy package. It does not attempt to replace MD, docking, FEP, or commercial pocket-detection tools.
 
 ---
 
 ## Limitations
 
-- Literature NMR lists (`--prior literature`) are conservative YAML subsets so CI stays offline
-- RelaxDB-CPMG KRAS labels are vendored; TEM-1 is **not** in that set (`BLAC_CPMG` = Mtb BlaC)
-- Dyna-1 is optional; captions must say Dyna-1 vs literature
+- `--prior literature` is a curated YAML subset for offline CI
+- RelaxDB-CPMG covers KRAS; TEM-1 is absent (`BLAC_CPMG` = Mtb BlaC)
+- Dyna-1 is optional; figures must name the prior
 - Headline geometry is seed clearance; volume is secondary
-- Detector `0.2.0` is frozen: ligand-scale local maxima, `exclude`/`include` holo modes
 - VP35 is download-gated; without the trajectory there is no MD claim
-- No docking, no FEP, no wet-lab activity
 
 ---
 
@@ -193,8 +187,6 @@ pip install -U pip && pip install -e ".[dev]"
 bash scripts/reproduce.sh
 pytest -q
 ```
-
-Requires **Python 3.11+**. RCSB must be reachable for the first fetch; afterward PDBs live in `data/raw/` (gitignored).
 
 ---
 
@@ -215,15 +207,21 @@ out/figures/      README figures
 
 ---
 
+## Citation
+
+See [`CITATION.cff`](CITATION.cff).
+
+---
+
 ## Acknowledgments
 
 Structures from the [RCSB PDB](https://www.rcsb.org/). TEM-1 horn: Horn & Shoichet (2004). TEM-1 NMR: Savard & Gagné (2006). KRAS holo: Canon *et al.* (2019), PDB `6OIM`. Dyna-1 / RelaxDB: Wayment-Steele, El Nesr, Kern *et al.*, *Nature* (2026). VP35 FAST+FAH: Cruz *et al.* (2022); Mallimadugula *et al.* (2025), Zenodo 10.5281/zenodo.15854842.
 
 ---
 
-## AI Assistance
+## AI assistance
 
-Development of this repository was assisted by Cursor (AI-powered code editor) for code generation, refactoring, documentation, and routine implementation tasks. All scientific design, algorithmic decisions, validation, testing, and final code review were performed by the author.
+Cursor was used for code generation, refactoring, documentation, and routine implementation. Scientific design, analysis, validation, and final review were performed by the author.
 
 ---
 
