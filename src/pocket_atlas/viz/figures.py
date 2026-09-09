@@ -21,43 +21,82 @@ def _style(ax) -> None:
     ax.title.set_color(TEXT)
 
 
+def _prior_label(source: str) -> str:
+    if source == "dyna1":
+        return "Dyna-1"
+    if source == "relaxdb_cpmg":
+        return "RelaxDB-CPMG"
+    return "literature NMR"
+
+
+def _case_title(camp: Campaign) -> str:
+    raw = camp.case.raw.get("title") or camp.case.name
+    if camp.case.name == "tem1_horn":
+        return "TEM-1 horn"
+    if camp.case.name == "kras_switch2":
+        return "KRAS switch-II"
+    return raw
+
+
 def fig_overlap_enrichment(campaigns: list[Campaign], path: Path | None = None) -> Path:
-    """Hero figure: NMR/Dyna-1 enrichment in cryptic lining vs catalytic control."""
+    """Hero: one panel per case so a 0.00 bar and an 8× control are both readable."""
     ensure_dirs()
     path = path or (FIGURES / "fig4_overlap_enrichment.png")
-    labels = []
-    cryptic = []
-    control = []
-    sources = []
-    for camp in campaigns:
-        labels.append(camp.case.name.replace("_", " "))
-        cryptic.append(camp.overlap.cryptic_enrichment)
-        control.append(camp.overlap.control_enrichment)
-        sources.append(camp.scores_source)
-
-    fig, ax = plt.subplots(figsize=(7.08, 3.6), dpi=200)
+    n = max(len(campaigns), 1)
+    fig, axes = plt.subplots(1, n, figsize=(3.54 * n, 3.8), dpi=200, sharey=True)
     fig.patch.set_facecolor(FACE)
-    x = np.arange(len(labels))
-    width = 0.36
-    ax.bar(x - width / 2, cryptic, width, color=TEAL, label="Cryptic lining")
-    ax.bar(x + width / 2, control, width, color=ACCENT, label="Catalytic / nucleotide site")
-    ax.axhline(1.0, color=MUTED, ls="--", lw=1, label="No enrichment")
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels)
-    ax.set_ylabel("Enrichment vs protein background")
-    ax.set_title("Do NMR-timescale residues sit on cryptic sites?")
-    ax.legend(frameon=False, loc="upper right")
-    _style(ax)
-    source = ", ".join(dict.fromkeys(sources)) if sources else ""
-    label = "Dyna-1" if source == "dyna1" else (
-        "RelaxDB-CPMG" if source == "relaxdb_cpmg" else "literature NMR"
-    )
-    ax.text(
-        0.0,
-        -0.22,
-        f"Prior: {label} ({source}). Caption: Dyna-1 vs literature when both exist; "
-        "else the named prior. Enrichment = (prior ∩ set) / |set| / background.",
-        transform=ax.transAxes,
+    if n == 1:
+        axes = [axes]
+
+    ymax = 1.4
+    for camp in campaigns:
+        ymax = max(ymax, camp.overlap.cryptic_enrichment, camp.overlap.control_enrichment)
+    ymax = ymax * 1.22
+
+    sources = []
+    for ax, camp in zip(axes, campaigns, strict=True):
+        ov = camp.overlap
+        sources.append(ov.source)
+        vals = [ov.cryptic_enrichment, ov.control_enrichment]
+        counts = [
+            f"{ov.cryptic_and_nmr}/{ov.n_cryptic}",
+            f"{ov.control_and_nmr}/{ov.n_control}",
+        ]
+        names = ["Cryptic\nlining", "Catalytic /\nnucleotide"]
+        colors = [TEAL, ACCENT]
+        bars = ax.bar(names, vals, color=colors, width=0.62, zorder=2)
+        ax.axhline(1.0, color=MUTED, ls="--", lw=1, zorder=1)
+        for bar, val, count in zip(bars, vals, counts, strict=True):
+            # Zero-height bars are invisible; keep a baseline tick + label.
+            y = val if val > 0.08 else 0.0
+            va = "bottom" if val > 0.08 else "bottom"
+            offset = 0.12 if val > 0.08 else 0.12
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                y + offset,
+                f"{val:.2f}\n({count})",
+                ha="center",
+                va=va,
+                color=TEXT,
+                fontsize=8,
+            )
+        ax.set_ylim(0, ymax)
+        ax.set_title(_case_title(camp), color=TEXT, fontsize=11)
+        _style(ax)
+        ax.tick_params(axis="x", labelsize=8)
+
+    axes[0].set_ylabel("Enrichment vs protein background")
+    fig.suptitle("Do NMR-timescale residues sit on cryptic sites?", color=TEXT, fontsize=12, y=1.02)
+    prior = _prior_label(sources[0] if sources else "")
+    extras = ""
+    if len(set(sources)) > 1:
+        extras = "  ·  " + "; ".join(f"{_case_title(c)}: {_prior_label(c.overlap.source)}" for c in campaigns)
+    fig.text(
+        0.5,
+        -0.04,
+        f"Prior: {prior}{extras}. Dashed line = no enrichment. "
+        "Numbers on bars: enrichment (NMR ∩ set / |set|).",
+        ha="center",
         color=MUTED,
         fontsize=8,
     )
