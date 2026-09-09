@@ -21,15 +21,19 @@ def write_markdown(campaigns: list[Campaign], path: Path | None = None) -> Path:
         ov = camp.overlap
         apo_vol = camp.apo.site_pocket.volume if camp.apo.site_pocket else 0.0
         holo_vol = camp.holo.site_pocket.volume if camp.holo.site_pocket else 0.0
+        apo_clr = camp.extra.get("apo_clearance", 0.0)
+        holo_clr = camp.extra.get("holo_clearance", 0.0)
         chunks += [
             f"## {camp.case.raw.get('title', camp.case.name)}",
             "",
-            f"- Apo `{camp.apo.pdb_id}` site recovered: **{camp.cryptic_in_apo}** ({apo_vol:.0f} Å³)",
-            f"- Holo `{camp.holo.pdb_id}` site recovered: **{camp.cryptic_in_holo}** ({holo_vol:.0f} Å³)",
+            f"- Apo `{camp.apo.pdb_id}` site recovered: **{camp.cryptic_in_apo}** "
+            f"(clearance {apo_clr:.2f} Å; volume {apo_vol:.0f} Å³ is secondary)",
+            f"- Holo `{camp.holo.pdb_id}` site recovered: **{camp.cryptic_in_holo}** "
+            f"(clearance {holo_clr:.2f} Å; volume {holo_vol:.0f} Å³ is secondary)",
             f"- NMR ∩ cryptic lining: {ov.cryptic_and_nmr}/{ov.n_cryptic} (enrichment {ov.cryptic_enrichment:.2f})",
             f"- NMR ∩ control site: {ov.control_and_nmr}/{ov.n_control} (enrichment {ov.control_enrichment:.2f})",
             f"- Odds ratio (cryptic vs control): {ov.odds_ratio:.2f}",
-            f"- Prior: `{ov.source}`",
+            f"- Prior: `{ov.source}` (Dyna-1 vs literature when both exist)",
             "",
         ]
         if camp.case.name == "tem1_horn":
@@ -50,9 +54,11 @@ def write_markdown(campaigns: list[Campaign], path: Path | None = None) -> Path:
     chunks += [
         "## Limitations",
         "",
-        "- Literature NMR residue lists are curated subsets, not the full RelaxDB dump.",
-        "- Dyna-1 weights are optional; when absent the prior is those literature labels.",
-        "- Pocket volumes are a geometric analogue, not SiteMap Dscore.",
+        "- `--prior literature` is the curated YAML (CI/demo, offline).",
+        "- `--prior relaxdb` uses RelaxDB-CPMG. KRAS is in that set; TEM-1 is not "
+        "(BLAC_CPMG is Mtb BlaC P9WKD3, not TEM-1).",
+        "- Dyna-1 weights are optional; captions must say Dyna-1 vs literature.",
+        "- Headline geometry is seed clearance, not matched-site volume.",
         "- VP35 trajectories are not downloaded by the demo (multi-GB Zenodo archives).",
         "",
     ]

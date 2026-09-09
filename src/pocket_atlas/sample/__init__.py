@@ -12,9 +12,9 @@ from pathlib import Path
 import requests
 
 from pocket_atlas.cases import load_case
+from pocket_atlas.dynamics import overlap_case
 from pocket_atlas.dynamics.dyna1 import high_exchange_residues, load_cached_scores
 from pocket_atlas.dynamics.labels import resolve_prior
-from pocket_atlas.dynamics import overlap_case
 from pocket_atlas.paths import PROCESSED, RAW, ensure_dirs
 
 ZENODO_API = "https://zenodo.org/api/records/{record}"
