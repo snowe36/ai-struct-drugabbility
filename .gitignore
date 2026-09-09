@@ -15,6 +15,7 @@ data/raw/*
 !data/raw/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
+!data/processed/*_dyna1.json
 artifacts/
 
 # Pipeline scratch (keep committed README figures)

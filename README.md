@@ -41,6 +41,8 @@ In KRAS, published μs–ms NMR dynamics substantially overlap the switch-II cry
 
 `--prior relaxdb` replaces the conservative KRAS YAML subset with the official RelaxDB-CPMG X/Y set (58 residues, including the P-loop): **19/26**, **2.10×** cryptic; 7/16 nucleotide, 1.26×. More labels raise the background, so enrichment falls. TEM-1 stays on literature NMR: RelaxDB-CPMG has no TEM-1 entry (`BLAC_CPMG` is Mtb BlaC, `P9WKD3`, not TEM-1 `P62593`).
 
+`--prior dyna1` (top quintile of predicted *p*(exchange)) does **not** recover that KRAS prior: **7/26**, **1.32×** cryptic vs 4/16 nucleotide, 1.23×. TEM-1 horn stays empty (**1/18**, **0.29×**). Predicted exchange is a weaker spatial prior than published NMR. See [Dyna-1](#dyna-1-is-a-weaker-prior-than-published-nmr).
+
 TEM-1 horn lining is buried hydrophobic core, not the Ω-loop. Savard & Gagné μs–ms exchange sits at the Ω-loop and active-site vicinity — so zero cryptic overlap is the measurement. KRAS switch-I/II carry both the published exchange and the sotorasib lining.
 
 <p align="center">
@@ -63,7 +65,7 @@ pocket-demo
 # or: bash demo/run_demo.sh
 ```
 
-Fetches TEM-1 (`1BTL`/`1PZO`) and KRAS (`5V9U`/`6OIM`) from RCSB, detects ligand-scale cavities, and scores literature NMR labels (`--prior literature`) against cryptic lining vs the catalytic / nucleotide control. Official RelaxDB-CPMG labels are `--prior relaxdb` (offline; vendored). Dyna-1 is `--prior dyna1` and needs weights.
+Fetches TEM-1 (`1BTL`/`1PZO`) and KRAS (`5V9U`/`6OIM`) from RCSB, detects ligand-scale cavities, and scores literature NMR labels (`--prior literature`) against cryptic lining vs the catalytic / nucleotide control. Official RelaxDB-CPMG labels are `--prior relaxdb` (offline; vendored). Dyna-1 is `--prior dyna1` against cached scores in `data/processed/*_dyna1.json` (GPU weights only to rescore).
 
 Outputs: `out/overlap.md`, `out/figures/`.
 
@@ -131,18 +133,35 @@ Literature NMR lists (`--prior literature`) are conservative YAML subsets so CI 
 
 ---
 
-## Optional Dyna-1
+## Dyna-1 is a weaker prior than published NMR
 
-Dyna-1 (Wayment-Steele, Kern *et al.*, *Nature* 2026) predicts per-residue *p*(μs–ms exchange) from missing BMRB assignment-table information. It tracks RelaxDB / CPMG.
+Dyna-1 (Wayment-Steele, Kern *et al.*, *Nature* 2026) predicts per-residue *p*(μs–ms exchange) from missing BMRB assignment-table information. Overlap uses the top quintile of those scores (`--prior dyna1`) on the same cryptic linings as the literature table.
 
-Weights: Hugging Face [`gelnesr/Dyna-1`](https://huggingface.co/gelnesr/Dyna-1). Code: [WaymentSteeleLab/Dyna-1](https://github.com/WaymentSteeleLab/Dyna-1).
+Predicted exchange does not recover the KRAS NMR result and still misses the TEM-1 horn.
+
+| Case | Prior | Cryptic | Enrichment | Control |
+|------|--------|---------|------------|---------|
+| KRAS switch-II | literature NMR | **19/26** | **4.07×** | 3/16, 1.04× |
+| KRAS switch-II | Dyna-1 | **7/26** | **1.32×** | 4/16, 1.23× |
+| TEM-1 horn | literature NMR | **0/18** | **0.00×** | 6/6, 8.77× |
+| TEM-1 horn | Dyna-1 | **1/18** | **0.29×** | 0/6, 0.00× |
+
+<p align="center">
+  <img src="out/figures/fig5_dyna1_vs_literature.png" alt="Dyna-1 vs literature NMR cryptic enrichment for TEM-1 and KRAS" width="720"/>
+</p>
+
+<p align="center"><em>Figure 5. Dyna-1 top-quintile p(exchange) does not recover the KRAS literature enrichment (7/26, 1.32× vs 19/26, 4.07×). TEM-1 horn stays empty (1/18, 0.29×). Dashed line is no enrichment versus protein background.</em></p>
+
+Scores are cached from apo `1BTL` and `5V9U` (`data/processed/{case}_dyna1.json`). Report: [`out/overlap_dyna1.md`](out/overlap_dyna1.md). Weights: Hugging Face [`gelnesr/Dyna-1`](https://huggingface.co/gelnesr/Dyna-1). Code: [WaymentSteeleLab/Dyna-1](https://github.com/WaymentSteeleLab/Dyna-1).
 
 ```bash
+pocket-overlap --prior dyna1
+# rescore (needs GPU + weights):
 pip install -e ".[dyna]"
 pocket-dyna --case tem1_horn --pdb data/processed/tem1_horn_apo_1BTL.pdb
 ```
 
-If weights are missing the command prints why and stops.
+If weights are missing, `pocket-dyna` prints why and stops. `--prior dyna1` without a cache falls back to literature NMR.
 
 ---
 
@@ -171,7 +190,8 @@ Pocket Atlas is a geometric / NMR-prior analysis framework, not a molecular-dock
 
 - `--prior literature` is a curated YAML subset for offline CI
 - RelaxDB-CPMG covers KRAS; TEM-1 is absent (`BLAC_CPMG` = Mtb BlaC)
-- Dyna-1 is optional; figures must name the prior
+- Dyna-1 top-quintile *p*(exchange) is near background on KRAS (7/26, 1.32×) and still misses the TEM-1 horn (1/18, 0.29×)
+- Captions must name the prior (literature / RelaxDB-CPMG / Dyna-1)
 - Headline geometry is seed clearance; volume is secondary
 - VP35 is download-gated; without the trajectory there is no MD claim
 

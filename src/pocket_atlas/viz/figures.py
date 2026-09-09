@@ -8,7 +8,7 @@ from matplotlib.patches import FancyBboxPatch
 
 from pocket_atlas.paths import FIGURES, ensure_dirs
 from pocket_atlas.pipeline import Campaign
-from pocket_atlas.viz.palette import ACCENT, CARD_BG, CORAL, FACE, GRID, MUTED, TEAL, TEXT
+from pocket_atlas.viz.palette import ACCENT, CARD_BG, CORAL, FACE, GRID, MUSTARD, MUTED, SAGE, TEAL, TEXT
 
 
 def _style(ax) -> None:
@@ -114,6 +114,68 @@ def fig_overlap_enrichment(campaigns: list[Campaign], path: Path | None = None) 
         ha="center",
         color=MUTED,
         fontsize=8,
+    )
+    fig.tight_layout()
+    fig.subplots_adjust(bottom=0.22)
+    fig.savefig(path, bbox_inches="tight", facecolor=FACE)
+    plt.close(fig)
+    return path
+
+
+def fig_dyna1_vs_literature(
+    literature: list[Campaign],
+    dyna1: list[Campaign],
+    path: Path | None = None,
+) -> Path:
+    """Cryptic enrichment: published NMR vs Dyna-1 top-quintile p(exchange)."""
+    ensure_dirs()
+    path = path or (FIGURES / "fig5_dyna1_vs_literature.png")
+    by_dyna = {c.case.name: c for c in dyna1}
+    pairs = [(lit, by_dyna[lit.case.name]) for lit in literature if lit.case.name in by_dyna]
+    n = max(len(pairs), 1)
+    fig, axes = plt.subplots(1, n, figsize=(3.54 * n, 3.9), dpi=200, sharey=True)
+    fig.patch.set_facecolor(FACE)
+    if n == 1:
+        axes = [axes]
+
+    ymax = 1.4
+    for lit, dyn in pairs:
+        ymax = max(ymax, lit.overlap.cryptic_enrichment, dyn.overlap.cryptic_enrichment)
+    ymax = ymax * 1.28
+
+    for ax, (lit, dyn) in zip(axes, pairs, strict=True):
+        vals = [lit.overlap.cryptic_enrichment, dyn.overlap.cryptic_enrichment]
+        counts = [
+            f"{lit.overlap.cryptic_and_nmr}/{lit.overlap.n_cryptic}",
+            f"{dyn.overlap.cryptic_and_nmr}/{dyn.overlap.n_cryptic}",
+        ]
+        ax.bar(range(2), vals, color=[SAGE, MUSTARD], width=0.62, zorder=2)
+        ax.axhline(1.0, color=MUTED, ls="--", lw=1, zorder=1)
+        trans = ax.get_xaxis_transform()
+        for i, (val, count) in enumerate(zip(vals, counts, strict=True)):
+            if val < 0.35:
+                ax.text(
+                    i, -0.14, f"{val:.2f} ({count})",
+                    transform=trans, ha="center", va="top", color=TEXT, fontsize=8, clip_on=False,
+                )
+            else:
+                ax.text(
+                    i, val + 0.12, f"{val:.2f} ({count})",
+                    ha="center", va="bottom", color=TEXT, fontsize=8, zorder=3,
+                )
+        ax.set_xticks(range(2))
+        ax.set_xticklabels(["Literature NMR", "Dyna-1"])
+        ax.set_ylim(0, ymax)
+        ax.set_title(_case_title(lit), color=TEXT, fontsize=11)
+        _style(ax)
+        ax.tick_params(axis="x", labelsize=8, pad=10)
+
+    axes[0].set_ylabel("Cryptic enrichment vs protein background")
+    fig.suptitle("Does predicted exchange recover the NMR prior?", color=TEXT, fontsize=12, y=1.02)
+    fig.text(
+        0.5, -0.04,
+        "Dyna-1 = top quintile p(μs–ms exchange). Dashed line = no enrichment.",
+        ha="center", color=MUTED, fontsize=8,
     )
     fig.tight_layout()
     fig.subplots_adjust(bottom=0.22)
