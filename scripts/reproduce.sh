@@ -6,4 +6,6 @@ cd "$ROOT"
 
 python3 -m pip install -e ".[dev]" >/dev/null
 pocket-demo
+pocket-plane
+pocket-rank --cases tem1_horn kras_switch2 --prior literature
 pytest -q
