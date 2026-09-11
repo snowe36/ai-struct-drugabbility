@@ -40,6 +40,16 @@ def save_scores(case_name: str, scores: dict[int, float]) -> Path:
     return path
 
 
+def remap_index_scores(scores: dict[int, float], pdb_path: Path, chain: str = "A") -> dict[int, float]:
+    """Map 1..N Dyna-1 positions onto PDB resseq (3FKE is 218–340, not 1–123)."""
+    from pocket_atlas.io.pdb import read_pdb
+
+    resseqs = sorted(read_pdb(pdb_path).residue_ca(chain=chain))
+    ordered = [scores[i] for i in sorted(scores)]
+    n = min(len(resseqs), len(ordered))
+    return {resseqs[i]: ordered[i] for i in range(n)}
+
+
 def high_exchange_residues(scores: dict[int, float], quantile: float = 0.8) -> set[int]:
     if not scores:
         return set()

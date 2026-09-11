@@ -18,6 +18,23 @@ def load_relaxdb_bundle() -> dict:
         return yaml.safe_load(handle)
 
 
+def cpmg_entry(entry_id: str) -> dict:
+    bundle = load_relaxdb_bundle()
+    entry = bundle["entries"].get(entry_id)
+    if entry is None:
+        raise KeyError(f"unknown CPMG entry {entry_id!r}")
+    return entry
+
+
+def cpmg_exchange_residues(entry_id: str) -> frozenset[int]:
+    """1-based indices into the deposited CPMG sequence (X/Y)."""
+    return frozenset(int(r) for r in cpmg_entry(entry_id)["exchange_residues"])
+
+
+def list_cpmg_entries() -> list[str]:
+    return sorted(load_relaxdb_bundle()["entries"])
+
+
 def relaxdb_residues(case_name: str) -> frozenset[int] | None:
     """Official RelaxDB-CPMG exchange residues, or None if this case has none.
 
