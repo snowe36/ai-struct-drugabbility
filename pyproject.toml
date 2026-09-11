@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pocket-atlas"
 version = "0.1.0"
-description = "NMR-timescale dynamics as a prior for cryptic ligandable sites (TEM-1, KRAS, VP35)"
+description = "Experimental μs–ms NMR exchange mapped onto ligand-scale clearance maxima"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -24,6 +24,9 @@ dependencies = [
 dev = ["pytest>=7.4", "ruff>=0.6"]
 dyna = ["torch>=2.1"]
 md = ["mdtraj>=1.9.9"]
+dock = []
+xtb = []
+miner = []
 pymol = []
 
 [project.scripts]
@@ -37,6 +40,11 @@ pocket-md = "pocket_atlas.cli:md_analyze_main"
 pocket-fetch-nmr = "pocket_atlas.cli:fetch_nmr_main"
 pocket-report = "pocket_atlas.cli:report_main"
 pocket-figures = "pocket_atlas.cli:figures_main"
+pocket-dock = "pocket_atlas.cli:dock_main"
+pocket-strain = "pocket_atlas.cli:strain_main"
+pocket-prepare-crystal = "pocket_atlas.cli:prepare_crystal_main"
+pocket-rank = "pocket_atlas.cli:rank_main"
+pocket-plane = "pocket_atlas.cli:plane_main"
 pocket-demo = "pocket_atlas.demo:run_demo_main"
 
 [tool.setuptools.packages.find]

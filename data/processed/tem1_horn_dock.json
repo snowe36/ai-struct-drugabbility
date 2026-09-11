@@ -1,0 +1,92 @@
+[
+  {
+    "case": "tem1_horn",
+    "receptor": "apo",
+    "box": "cryptic",
+    "ligand": "CBT",
+    "best": {
+      "rank": 1,
+      "vina": -5.528,
+      "cnn_score": 0.567,
+      "cnn_affinity": 4.578,
+      "rmsd": null
+    },
+    "n_poses": 9,
+    "sdf": "/workspace/pocket-atlas/data/processed/dock/tem1_horn/apo_cryptic.sdf"
+  },
+  {
+    "case": "tem1_horn",
+    "receptor": "apo",
+    "box": "control",
+    "ligand": "CBT",
+    "best": {
+      "rank": 1,
+      "vina": -7.001,
+      "cnn_score": 0.328,
+      "cnn_affinity": 4.664,
+      "rmsd": null
+    },
+    "n_poses": 9,
+    "sdf": "/workspace/pocket-atlas/data/processed/dock/tem1_horn/apo_control.sdf"
+  },
+  {
+    "case": "tem1_horn",
+    "receptor": "apo",
+    "box": "nmr",
+    "ligand": "CBT",
+    "best": {
+      "rank": 1,
+      "vina": -5.227,
+      "cnn_score": 0.67,
+      "cnn_affinity": 3.935,
+      "rmsd": null
+    },
+    "n_poses": 9,
+    "sdf": "/workspace/pocket-atlas/data/processed/dock/tem1_horn/apo_nmr.sdf"
+  },
+  {
+    "case": "tem1_horn",
+    "receptor": "holo",
+    "box": "cryptic",
+    "ligand": "CBT",
+    "best": {
+      "rank": 1,
+      "vina": -7.761,
+      "cnn_score": 0.821,
+      "cnn_affinity": 5.753,
+      "rmsd": null
+    },
+    "n_poses": 9,
+    "sdf": "/workspace/pocket-atlas/data/processed/dock/tem1_horn/holo_cryptic.sdf"
+  },
+  {
+    "case": "tem1_horn",
+    "receptor": "holo",
+    "box": "control",
+    "ligand": "CBT",
+    "best": {
+      "rank": 1,
+      "vina": -7.383,
+      "cnn_score": 0.649,
+      "cnn_affinity": 5.143,
+      "rmsd": null
+    },
+    "n_poses": 9,
+    "sdf": "/workspace/pocket-atlas/data/processed/dock/tem1_horn/holo_control.sdf"
+  },
+  {
+    "case": "tem1_horn",
+    "receptor": "holo",
+    "box": "nmr",
+    "ligand": "CBT",
+    "best": {
+      "rank": 1,
+      "vina": -6.226,
+      "cnn_score": 0.555,
+      "cnn_affinity": 4.748,
+      "rmsd": null
+    },
+    "n_poses": 9,
+    "sdf": "/workspace/pocket-atlas/data/processed/dock/tem1_horn/holo_nmr.sdf"
+  }
+]

@@ -1,0 +1,83 @@
+description: Experimental CPMG exchange mapped onto apo crystals. Sequence index aligned to PDB resseq
+  at run time.
+prior: relaxdb_cpmg
+proteins:
+- id: aqadk
+  entry_id: AQADK_CPMG
+  pdb_id: 2RH5
+  chain: A
+  title: Aquifex adenylate kinase
+  uniprot: O66490
+  existing_case: false
+- id: blac_mtb
+  entry_id: BLAC_CPMG
+  pdb_id: 2GDN
+  chain: A
+  title: M. tuberculosis BlaC
+  uniprot: P9WKD3
+  existing_case: false
+- id: blvrb
+  entry_id: BLVRB_CPMG
+  pdb_id: 1HDO
+  chain: A
+  title: Human biliverdin reductase B
+  uniprot: P30043
+  existing_case: false
+- id: cypa
+  entry_id: CYPA_CPMG
+  pdb_id: 2CPL
+  chain: A
+  title: Human cyclophilin A
+  uniprot: P62937
+  existing_case: false
+- id: vhr
+  entry_id: VHR_CPMG
+  pdb_id: 1VHR
+  chain: A
+  title: Human VHR phosphatase (DUSP3)
+  uniprot: P51452
+  existing_case: false
+- id: argkin
+  entry_id: ARGKIN_CPMG
+  pdb_id: 1M15
+  chain: A
+  title: Limulus arginine kinase
+  uniprot: P51541
+  existing_case: false
+- id: rnase_a
+  entry_id: RNASE_CPMG
+  pdb_id: 7RSA
+  chain: A
+  title: Bovine RNase A
+  uniprot: P61824
+  existing_case: false
+- id: chey
+  entry_id: CHEY_CPMG
+  pdb_id: 3CHY
+  chain: A
+  title: E. coli CheY
+  uniprot: P0AE67
+  existing_case: false
+- id: htra2_pdz
+  entry_id: HTPDZ_CPMG
+  pdb_id: 2PZD
+  chain: A
+  title: Human HTRA2 PDZ domain
+  uniprot: O43464
+  existing_case: false
+- id: kras_switch2
+  entry_id: KRAS_CPMG
+  pdb_id: 5V9U
+  chain: A
+  title: "KRAS G12C\xB7GDP"
+  uniprot: null
+  existing_case: true
+literature_extra:
+- id: tem1_horn
+  entry_id: null
+  pdb_id: 1BTL
+  chain: A
+  title: "TEM-1 \u03B2-lactamase (literature NMR, not RelaxDB-CPMG)"
+  uniprot: P62593
+  existing_case: true
+  prior: literature

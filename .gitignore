@@ -5,6 +5,7 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.mplconfig/
 .DS_Store
 .env
 .idea/
@@ -16,6 +17,12 @@ data/raw/*
 data/processed/*
 !data/processed/.gitkeep
 !data/processed/*_dyna1.json
+!data/processed/*_dock.json
+!data/processed/dock_summary.json
+!data/processed/vp35_occupancy.json
+!data/processed/*_strain.json
+!data/processed/*_rank.json
+!data/processed/cpmg_plane.json
 artifacts/
 
 # Pipeline scratch (keep committed README figures)

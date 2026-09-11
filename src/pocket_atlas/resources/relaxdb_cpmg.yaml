@@ -5,8 +5,558 @@ exchange_letters:
 - X
 - Y
 note: X = Rex criteria, Y = unsuppressed R2 (Hugging Face gelnesr/RelaxDB vocab). BLAC_CPMG is M. tuberculosis
-  BlaC (P9WKD3), not E. coli TEM-1 (P62593). Do not map BLAC labels onto 1BTL/1PZO.
+  BlaC (P9WKD3), not E. coli TEM-1 (P62593). Do not map those labels onto 1BTL/1PZO. RNASE lowercase p
+  in the dump is proline (P), not exchange.
 entries:
+  AQADK_CPMG:
+    entry_id: AQADK_CPMG
+    name: MesoAdK
+    uniprot: O66490
+    seq_len: 206
+    sequence: MILVFLGPPGAGKGTQAKRLAKEKGFVHISTGDILREAVQKGTPLGKKAKEYMERGELVPDDLIIALIEEVFPKHGNVIFDGFPRTVKQAEALDEMLEKKGLKVDHVLLFEVPDEVVIERLSGRRINPETGEVYHVKYNPPPPGVKVIQREDDKPEVIKKRLEVYREQTAPLIEYYKKKGILRIIDASKPVEEVYRQVLEVIGDGN
+    label: .AAAAA.PPXN...YANYANNANYXNNXXX..XYAAAAANANXPAYAAAANYYYAXNNXPXAANAANNAAAXP..AXNNAAYAPXXAAYNNANNNNAAANANXXAXAANAXXPXANAA.ANYAANXXPNYANAXANANXPPPPNNXXANYAXAAPAANAAANNNNXNAYAPANAANXNAAAXAXNNXYAPNAAANAXNAAXANNAX
+    exchange_residues:
+    - 10
+    - 15
+    - 18
+    - 24
+    - 25
+    - 28
+    - 29
+    - 30
+    - 33
+    - 34
+    - 43
+    - 46
+    - 52
+    - 53
+    - 54
+    - 56
+    - 59
+    - 61
+    - 72
+    - 77
+    - 82
+    - 85
+    - 86
+    - 89
+    - 103
+    - 104
+    - 106
+    - 111
+    - 112
+    - 114
+    - 122
+    - 126
+    - 127
+    - 130
+    - 134
+    - 139
+    - 146
+    - 147
+    - 150
+    - 152
+    - 166
+    - 169
+    - 177
+    - 182
+    - 184
+    - 187
+    - 188
+    - 197
+    - 201
+    - 206
+    label_counts:
+      .: 10
+      A: 79
+      P: 15
+      X: 35
+      N: 52
+      Y: 15
+    data_origin: ''
+    authors: Henzler-Wildman ... Kern (2007) Nature
+    doi: null
+    numbering: CPMG sequence index (1-based, aligned to deposited sequence)
+  BLAC_CPMG:
+    entry_id: BLAC_CPMG
+    name: BLAC
+    uniprot: P9WKD3
+    seq_len: 266
+    sequence: GDLADRFAELERRYDARLGVYVPATGTTAAIEYRADERFAFCSTFKAPLVAAVLHQNPLTHLDKLITYTSDDIRSISPVAQQHVQTGMTIGQLCDAAIRYSDGTAANLLLADLGGPGGGTAAFTGYLRSLGDTVSRLDAEEPELNRDPPGDERDTTTPHAIALVLQQLVLGNALPPDKRALLTDWMARNTTGAKRIRAGFPADWKVIDKTGTGDYGRANDIAVVWSPTGVPYVVAVMSDRAGGGYDAEPREALLAEAATCVAGVLA
+    label: ..AAAAAAAANAAAAAAAAAAAPANYAAAAAAAAAAAAXAXX.XXAAPXAAAAAYAAPYYAAAAAAAXYAAAAXAYYPAAAAAAAAAAAAANAAAAXXXA.XXYAAAAAAAANAXPYAXNAAAAAAAAAAAAAAXXAYXXXPXAXXAPPNXAAXAAAPAAAAAAAAAAAAAYAAPPAAAAAAAAAAXAAXXXXAAXYAAXPAAAAAAXN.X.XAAAXXAXAXAAXAPAAAPAAAAAAAXAAAAAAXAAPXAAAAAAAAAAAAAAAA
+    exchange_residues:
+    - 26
+    - 39
+    - 41
+    - 42
+    - 44
+    - 45
+    - 49
+    - 55
+    - 59
+    - 60
+    - 68
+    - 69
+    - 74
+    - 76
+    - 77
+    - 97
+    - 98
+    - 99
+    - 102
+    - 103
+    - 104
+    - 115
+    - 117
+    - 119
+    - 135
+    - 136
+    - 138
+    - 139
+    - 140
+    - 141
+    - 143
+    - 145
+    - 146
+    - 151
+    - 154
+    - 172
+    - 187
+    - 190
+    - 191
+    - 192
+    - 193
+    - 196
+    - 197
+    - 200
+    - 208
+    - 211
+    - 213
+    - 217
+    - 218
+    - 220
+    - 222
+    - 225
+    - 239
+    - 246
+    - 250
+    label_counts:
+      .: 6
+      A: 183
+      N: 7
+      P: 15
+      Y: 12
+      X: 43
+    data_origin: Rex labels were assigned  > 2 Hz from 850 Hz data (see BLAC_CPMG.xlsx)
+    authors: null
+    doi: null
+    numbering: CPMG sequence index (1-based, aligned to deposited sequence)
+  BLVRB_CPMG:
+    entry_id: BLVRB_CPMG
+    name: BLVRB
+    uniprot: P30043
+    seq_len: 206
+    sequence: MAVKKIAIFGATGQTGLTTLAQAVQAGYEVTVLVRDSSRLPSEGPRPAHVVVGDVLQAADVDKTVAGQDAVIVLLGTRNDLSPTTVMSEGARNIVAAMKAHGVDKVVACTSAFLLWDPTKVPPRLQAVTDDHIRMHKVLRESGLKYVAVMPPHIGDQPLTGAYTVTLDGRGPSRVISKHDLGHFMLRCLTTDEYDGHSTYPSHQYQ
+    label: ANAAYAAAXXAYXYXXAXYAAAAANAAAAAAAAAAYYAAAPYAAPAPAAAAAAANAAAYANAAYAAAAAAAAAXNXXYYXAAPXXANYAANNAAAAANAYXAANAAXXXNXNXYNANPYAYPPXXXXANXXXXXXXNAAXANAAAXXXXAPPXXXAXPAYYAAXNN..AN.P..NXYXAAAAANAAAYAAAANYAXXX..P...XA
+    exchange_residues:
+    - 5
+    - 9
+    - 10
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 18
+    - 19
+    - 36
+    - 37
+    - 42
+    - 59
+    - 64
+    - 74
+    - 76
+    - 77
+    - 78
+    - 79
+    - 80
+    - 84
+    - 85
+    - 88
+    - 100
+    - 101
+    - 107
+    - 108
+    - 109
+    - 111
+    - 113
+    - 114
+    - 119
+    - 121
+    - 124
+    - 125
+    - 126
+    - 127
+    - 130
+    - 131
+    - 132
+    - 133
+    - 134
+    - 135
+    - 136
+    - 140
+    - 146
+    - 147
+    - 148
+    - 149
+    - 153
+    - 154
+    - 155
+    - 157
+    - 160
+    - 161
+    - 164
+    - 176
+    - 177
+    - 178
+    - 188
+    - 194
+    - 196
+    - 197
+    - 198
+    - 205
+    label_counts:
+      A: 95
+      N: 23
+      Y: 21
+      X: 45
+      P: 12
+      .: 10
+    data_origin: Data private correspondence from EZE. Rex labels = where R2_50 - mean(R2_900,R2_1000)
+      >2. Cross-referenced with assignments in 27462 . data from https://www.sciencedirect.com/science/article/pii/S0022283618306119?via=ihub#f0020
+    authors: E.Z.E. shared
+    doi: null
+    numbering: CPMG sequence index (1-based, aligned to deposited sequence)
+  CYPA_CPMG:
+    entry_id: CYPA_CPMG
+    name: CypA
+    uniprot: P62937
+    seq_len: 165
+    sequence: MVNPTVFFDIAVDGEPLGRVSFELFADKVPKTAENFRALSTGEKGFGYKGSCFHRIIPGFMCQGGDFTRHNGTGGKSIYGEKFEDENFILKHTGPGILSMANAGPNTNGSQFFICTAKTEWLDGKHVVFGKVKEGMNIVEAMERFGSRNGKTSKKITIADCGQLE
+    label: ..APAAAAAYAAAAAPAXAAAAAAAAAAAPAYAAAAAAAAXAAXAXAX.YAXA.XXAPAAAXXAAAXXYNXYAXAXXXAA.XXAAYXXAAAXAAPAAAXAYXAAPAYXXXXAXAAANXXXAXNYXXXXYAAAAAYAAAAAXAAAAAAYYAAAAAAAAYAAAAAAA
+    exchange_residues:
+    - 10
+    - 18
+    - 32
+    - 41
+    - 44
+    - 46
+    - 48
+    - 50
+    - 52
+    - 55
+    - 56
+    - 62
+    - 63
+    - 67
+    - 68
+    - 69
+    - 71
+    - 72
+    - 74
+    - 76
+    - 77
+    - 78
+    - 82
+    - 83
+    - 86
+    - 87
+    - 88
+    - 92
+    - 99
+    - 101
+    - 102
+    - 107
+    - 108
+    - 109
+    - 110
+    - 111
+    - 113
+    - 118
+    - 119
+    - 120
+    - 122
+    - 124
+    - 125
+    - 126
+    - 127
+    - 128
+    - 129
+    - 135
+    - 141
+    - 148
+    - 149
+    - 158
+    label_counts:
+      .: 5
+      A: 99
+      P: 6
+      Y: 14
+      X: 38
+      N: 3
+    data_origin: ''
+    authors: EZE/MWC
+    doi: null
+    numbering: CPMG sequence index (1-based, aligned to deposited sequence)
+  VHR_CPMG:
+    entry_id: VHR_CPMG
+    name: VHR (PTP)
+    uniprot: P51452
+    seq_len: 185
+    sequence: MSGSFELSVQDLNDLLSDGSGCYSLPSQPCNEVTPRIYVGNASVAQDIPKLQKLGITHVLNAAEGRSFMHVNTNANFYKDSGITYLGIKANDTQEFNLSAYFERAADFIDQALAQKNGRVLVHCREGYSRSPTLVIAYLMMRQKMDVKSALSIVRQNREIGPNDGFLAQLCQLNDRLAKEGKLKP
+    label: .YAAAAAAAXAAAAAAAAXAAAXAXPXAPXAAXXP.AXAAXAAAXAXAPAAAXAAAXXXAXAXAAX.NY..XXNAAAYNAY.AAAAAXXA.XAAXYXYXAYAAAAAAAXAAAAAAY.AXAAAAX.......PAAAXAAAAAAAAAAAAAAAAAAAAAXX..PAXAXAAXAAAAAAAAAAAAAAAP
+    exchange_residues:
+    - 2
+    - 10
+    - 19
+    - 23
+    - 25
+    - 27
+    - 30
+    - 33
+    - 34
+    - 38
+    - 41
+    - 45
+    - 47
+    - 53
+    - 57
+    - 58
+    - 59
+    - 61
+    - 63
+    - 66
+    - 69
+    - 72
+    - 73
+    - 78
+    - 81
+    - 88
+    - 89
+    - 92
+    - 95
+    - 96
+    - 97
+    - 98
+    - 99
+    - 101
+    - 109
+    - 116
+    - 119
+    - 124
+    - 136
+    - 158
+    - 159
+    - 164
+    - 166
+    - 169
+    label_counts:
+      .: 17
+      Y: 8
+      A: 114
+      X: 36
+      P: 7
+      N: 3
+    data_origin: Taken from 800 MHz data (Table 7.10.3 in dissertation). Rex = R2(50) - mean(R2_1400,
+      R2_1600). use if Rex + Rex_err > 5. Matches roughly those id'ed in text as fit to single process
+    authors: Pat Loria
+    doi: https://www.proquest.com/docview/2395254828?%20Theses&fromopenview=true&pq-origsite=gscholar&sourcetype=Dissertations%20,
+      pg 207 onward
+    numbering: CPMG sequence index (1-based, aligned to deposited sequence)
+  ARGKIN_CPMG:
+    entry_id: ARGKIN_CPMG
+    name: Arginine Kinase
+    uniprot: P51541
+    seq_len: 357
+    sequence: MVDQATLDKLEAGFKKLQEASDCKSLLKKHLTKDVFDSIKNKKTGMGATLLDVIQSGVENLDSGVGIYAPDAESYRTFGPLFDPIIDDYHGGFKLTDKHPPKQWGDINTLVGLDPAGQFIISTRVRCGRSLQGYPFNPCLTAEQYKEMEEKVSSTLSSMEDELKGTYYPLTGMSKATQQQLIDDHFLFKEGDRFLQTANACRYWPTGRGIFHNDAKTFLVWVNEEDHLRIISMQKGGDLKTVYKRLVTAVDNIESKLPFSHDDRFGFLTFCPTNLGTTMRASVHIQLPKLAKDRKVLEDIASKFNLQVRGTRGEHTESEGGVYDISNKRRLGLTEYQAVREMQDGILEMIKMEKAAA
+    label: ..ANANAANAAAAAAANAAAAAAAAAAAAAAAAAAANAANAAAAANAAAAAAAAAAAAAANAAAAAANAPXANAAAAAAPANAPAAAXAXAXAAAAAAAPPAAAANAAAAAAAAPAANAAAANAAXXAXAAAAAPXXPAAAAANNAAAAAAAAAAAAAAAAAAAAAAAPAAAANAANAAAAXXXXAAANXXXXNAAXXAXXXN.PXXXXAAAAAAAAAAXAXAN..AAXAAAAXNAANAAAAANNAAAAAAANAAAAPAAAAAAAAAAAXXP.X.XA.AAAANAAAAPAAAAAAAAAAAAAAAAAAAAAAAAANNANAAAAAAAAAAAAANXAAANAAAA....AANNNAANAAAAA
+    exchange_residues:
+    - 71
+    - 88
+    - 90
+    - 92
+    - 126
+    - 127
+    - 129
+    - 136
+    - 137
+    - 182
+    - 183
+    - 184
+    - 185
+    - 190
+    - 191
+    - 192
+    - 193
+    - 197
+    - 198
+    - 200
+    - 201
+    - 202
+    - 206
+    - 207
+    - 208
+    - 209
+    - 220
+    - 222
+    - 229
+    - 234
+    - 270
+    - 271
+    - 274
+    - 276
+    - 332
+    label_counts:
+      .: 12
+      A: 260
+      N: 37
+      P: 13
+      X: 35
+    data_origin: Rex labels were taken from original paper in Fig. 3 as Rex > 2 standard deviations. Rex
+      was calculated by subtracting out transverse relaxation. https://pubs.acs.org/doi/epdf/10.1021/bi101664u.
+      Labels for overlap taken from Struct paper by same authors where R1/R2/NOE data came from.
+    authors: Skalicky
+    doi: https://www.sciencedirect.com/science/article/pii/S0969212609003372?via%3Dihub#fig3, FIgure 3
+    numbering: CPMG sequence index (1-based, aligned to deposited sequence)
+  RNASE_CPMG:
+    entry_id: RNASE_CPMG
+    name: RNase A
+    uniprot: P61824
+    seq_len: 124
+    sequence: KETAAAKFERQHMDSSTSAASSSNYCNQMMKSRNLTKDRCKPVNTFVHESLADVQAVCSQKNVACKNGQTNCYQSYSTMSITDCRETGSSKYPNCAYKTTQANKHIIVACEGNPYVPVHFDASV
+    label: AAAAAAAAXAXAXAXXXAAXAXAAAAXAAXAXAXXAAAAAXPAXAXXAAAAAAAAAAAXXAAAXAXAXAAXAAAAAAAAAAAXXAAXAAAAAPAAAAAAXXAAAAAAAAAAAAPAAPAXAXAAA
+    exchange_residues:
+    - 9
+    - 11
+    - 13
+    - 15
+    - 16
+    - 17
+    - 20
+    - 22
+    - 27
+    - 30
+    - 32
+    - 34
+    - 35
+    - 41
+    - 44
+    - 46
+    - 47
+    - 59
+    - 60
+    - 64
+    - 66
+    - 68
+    - 71
+    - 83
+    - 84
+    - 87
+    - 100
+    - 101
+    - 119
+    - 121
+    label_counts:
+      A: 90
+      X: 30
+      P: 4
+    data_origin: "Labels were taken from residues with >3 Hz at 20\u02DAC in either 500MHz or 600 MHz\
+      \ data (P Loria, private sharing of raw data). Aimed to recreate Fig. 4B in Beach ... Loria (2005)\
+      \ JACS"
+    authors: Beach ... Loria (2005) JACS
+    doi: https://doi.org/10.1021/ja0514949
+    numbering: CPMG sequence index (1-based, aligned to deposited sequence)
+  CHEY_CPMG:
+    entry_id: CHEY_CPMG
+    name: CheY
+    uniprot: P0AE67
+    seq_len: 129
+    sequence: MADKELKFLVVDDFSTMRRIVRNLLKELGFNNVEEAEDGVDALNKLQAGGYGFVISDWNMPNMDGLELLKTIRADGAMSALPVLMVTAEAKKENIIAAAQAGASGYVVKPFTAATLEEKLNKIFEKLGM
+    label: .AAAAAAAAAAA....AXXAAAAAAAAAAAAAAAAXAX.AAAAAAAAAAAAAAAAAA...PXAX.AXXXAAAAAAAAAAAAPAAAAXAA.A.AXAAAAAAAAAAAAXAAPAAAAAAAAAAAAAAAAXAA
+    exchange_residues:
+    - 18
+    - 19
+    - 36
+    - 38
+    - 62
+    - 64
+    - 67
+    - 68
+    - 69
+    - 87
+    - 94
+    - 107
+    - 127
+    label_counts:
+      .: 12
+      A: 101
+      X: 13
+      P: 3
+    data_origin: Figure 2 (missing peaks labels), Table 2 (Rex labels)
+    authors: 'can use as labels in assessment: see Table 2, Fig. 4 https://www.cell.com/structure/fulltext/S0969-2126(12)00210-9#tbl2'
+    doi: null
+    numbering: CPMG sequence index (1-based, aligned to deposited sequence)
+  HTPDZ_CPMG:
+    entry_id: HTPDZ_CPMG
+    name: Serine protease HTRA2, mitochondrial
+    uniprot: O43464
+    seq_len: 109
+    sequence: SGISGSQRRYIGVMMLTLSPSILAELQLREPSFPDVQHGVLIHKVILGSPAHRAGLRPGDVILAIGEQMVQNAEDVYEAVRTQSQLAVQIRRGRETLTLYVTPEVTELE
+    label: ..ANAAXAXX........XP...AAXXA.XPXXPX.NXX.X...XXAXAPAAAAAAAP.XXAXAAX.AA.X..XXXX.XAAAA.AAAAAAXNXAXXXAAAAAPXXAAAN
+    exchange_residues:
+    - 7
+    - 9
+    - 10
+    - 19
+    - 26
+    - 27
+    - 30
+    - 32
+    - 33
+    - 35
+    - 38
+    - 39
+    - 41
+    - 45
+    - 46
+    - 48
+    - 60
+    - 61
+    - 63
+    - 66
+    - 71
+    - 74
+    - 75
+    - 76
+    - 77
+    - 79
+    - 91
+    - 93
+    - 95
+    - 96
+    - 97
+    - 104
+    - 105
+    label_counts:
+      .: 26
+      A: 40
+      N: 4
+      X: 33
+      P: 6
+    data_origin: Cross-referenced source data, assns in BMRB 51320, Fig 2a
+    authors: null
+    doi: null
+    numbering: CPMG sequence index (1-based, aligned to deposited sequence)
   KRAS_CPMG:
     entry_id: KRAS_CPMG
     name: null
@@ -81,82 +631,10 @@ entries:
       Y: 1
       .: 1
     data_origin: ''
-    case: kras_switch2
-    numbering: sequence index == KRAS residue number (Met1 = 1)
-  BLAC_CPMG:
-    entry_id: BLAC_CPMG
-    name: BLAC
-    uniprot: P9WKD3
-    seq_len: 266
-    sequence: GDLADRFAELERRYDARLGVYVPATGTTAAIEYRADERFAFCSTFKAPLVAAVLHQNPLTHLDKLITYTSDDIRSISPVAQQHVQTGMTIGQLCDAAIRYSDGTAANLLLADLGGPGGGTAAFTGYLRSLGDTVSRLDAEEPELNRDPPGDERDTTTPHAIALVLQQLVLGNALPPDKRALLTDWMARNTTGAKRIRAGFPADWKVIDKTGTGDYGRANDIAVVWSPTGVPYVVAVMSDRAGGGYDAEPREALLAEAATCVAGVLA
-    label: ..AAAAAAAANAAAAAAAAAAAPANYAAAAAAAAAAAAXAXX.XXAAPXAAAAAYAAPYYAAAAAAAXYAAAAXAYYPAAAAAAAAAAAAANAAAAXXXA.XXYAAAAAAAANAXPYAXNAAAAAAAAAAAAAAXXAYXXXPXAXXAPPNXAAXAAAPAAAAAAAAAAAAAYAAPPAAAAAAAAAAXAAXXXXAAXYAAXPAAAAAAXN.X.XAAAXXAXAXAAXAPAAAPAAAAAAAXAAAAAAXAAPXAAAAAAAAAAAAAAAA
-    exchange_residues:
-    - 26
-    - 39
-    - 41
-    - 42
-    - 44
-    - 45
-    - 49
-    - 55
-    - 59
-    - 60
-    - 68
-    - 69
-    - 74
-    - 76
-    - 77
-    - 97
-    - 98
-    - 99
-    - 102
-    - 103
-    - 104
-    - 115
-    - 117
-    - 119
-    - 135
-    - 136
-    - 138
-    - 139
-    - 140
-    - 141
-    - 143
-    - 145
-    - 146
-    - 151
-    - 154
-    - 172
-    - 187
-    - 190
-    - 191
-    - 192
-    - 193
-    - 196
-    - 197
-    - 200
-    - 208
-    - 211
-    - 213
-    - 217
-    - 218
-    - 220
-    - 222
-    - 225
-    - 239
-    - 246
-    - 250
-    label_counts:
-      .: 6
-      A: 183
-      N: 7
-      P: 15
-      Y: 12
-      X: 43
-    data_origin: Rex labels were assigned  > 2 Hz from 850 Hz data (see BLAC_CPMG.xlsx)
-    case: null
-    numbering: BlaC sequence index, not TEM-1 Ambler
+    authors: Raphael Bruschweiler
+    doi: null
+    numbering: CPMG sequence index (1-based, aligned to deposited sequence)
 case_map:
-  kras_switch2: KRAS_CPMG
   tem1_horn: null
   vp35_iid: null
+  kras_switch2: KRAS_CPMG
