@@ -21,4 +21,6 @@ SAGE = PALETTE["sage"]
 MUSTARD = PALETTE["mustard"]
 ACCENT = PALETTE["peach"]
 CORAL = PALETTE["coral"]
+LAVENDER = PALETTE["lavender"]
+NAVY = PALETTE["navy"]
 CARD_BG = "#F7FAF9"

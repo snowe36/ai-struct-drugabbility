@@ -8,7 +8,18 @@ from matplotlib.patches import FancyBboxPatch
 
 from pocket_atlas.paths import FIGURES, ensure_dirs
 from pocket_atlas.pipeline import Campaign
-from pocket_atlas.viz.palette import ACCENT, CARD_BG, CORAL, FACE, GRID, MUSTARD, MUTED, SAGE, TEAL, TEXT
+from pocket_atlas.viz.palette import (
+    ACCENT,
+    CARD_BG,
+    CORAL,
+    FACE,
+    GRID,
+    MUSTARD,
+    MUTED,
+    SAGE,
+    TEAL,
+    TEXT,
+)
 
 
 def _style(ax) -> None:
@@ -313,3 +324,224 @@ def write_all_figures(campaigns: list[Campaign]) -> list[Path]:
         paths.append(fig_cartoon_trace(camp, which="holo"))
         paths.append(fig_tractability_card(camp))
     return paths
+
+
+def fig_dock_heatmap(jobs: list[dict], path: Path | None = None) -> Path:
+    """Best-pose CNN affinity by case × box × apo/holo."""
+    ensure_dirs()
+    path = path or (FIGURES / "fig6_dock_cnn.png")
+    cases = []
+    for job in jobs:
+        if job["case"] not in cases:
+            cases.append(job["case"])
+    boxes = ["cryptic", "nmr", "control"]
+    box_color = {"cryptic": TEAL, "nmr": SAGE, "control": ACCENT}
+    fig, axes = plt.subplots(1, max(len(cases), 1), figsize=(3.7 * max(len(cases), 1), 3.9), dpi=200, sharey=True)
+    fig.patch.set_facecolor(FACE)
+    if len(cases) <= 1:
+        axes = [axes]
+    for ax, case in zip(axes, cases, strict=False):
+        x = np.arange(2)
+        width = 0.25
+        for k, box in enumerate(boxes):
+            vals = []
+            for rec in ("apo", "holo"):
+                hit = next(
+                    (
+                        j["best"].get("cnn_affinity")
+                        for j in jobs
+                        if j["case"] == case and j["receptor"] == rec and j["box"] == box and j.get("best")
+                    ),
+                    None,
+                )
+                vals.append(np.nan if hit is None else float(hit))
+            ax.bar(x + (k - 1) * width, vals, width=width, color=box_color[box], label=box, zorder=2)
+        ax.set_xticks(x)
+        ax.set_xticklabels(["apo", "holo"])
+        title = "TEM-1 horn" if case == "tem1_horn" else (
+            "KRAS switch-II" if case == "kras_switch2" else case
+        )
+        ax.set_title(title, color=TEXT, fontsize=11)
+        _style(ax)
+    axes[0].set_ylabel("GNINA CNN affinity")
+    axes[-1].legend(frameon=False, fontsize=8)
+    fig.suptitle("Does the NMR box recover the crystal ligand?", color=TEXT, fontsize=12, y=1.02)
+    fig.text(
+        0.5, -0.04,
+        "Higher is better. Sotorasib is covalent to Cys12; this is a pose score, not ΔG.",
+        ha="center", color=MUTED, fontsize=8,
+    )
+    fig.tight_layout()
+    fig.savefig(path, bbox_inches="tight", facecolor=FACE)
+    plt.close(fig)
+    return path
+
+
+def fig_xtb_strain(payloads: list[dict], path: Path | None = None) -> Path:
+    ensure_dirs()
+    path = path or (FIGURES / "fig7_xtb_strain.png")
+    labels, vals, colors = [], [], []
+    palette = [SAGE, TEAL, MUSTARD, ACCENT, CORAL]
+    k = 0
+    for payload in payloads:
+        case = payload.get("case", "")
+        short = "TEM-1" if "tem1" in case else ("KRAS" if "kras" in case else case)
+        for name, row in payload.get("rows", {}).items():
+            labels.append(f"{short}\n{name}")
+            vals.append(float(row.get("strain_kcal") or 0.0))
+            colors.append(palette[k % len(palette)])
+            k += 1
+    fig, ax = plt.subplots(figsize=(max(3.54, 0.9 * max(len(vals), 1)), 3.6), dpi=200)
+    fig.patch.set_facecolor(FACE)
+    ax.bar(range(len(vals)), vals, color=colors or [TEAL], width=0.65)
+    ax.set_xticks(range(len(vals)))
+    ax.set_xticklabels(labels or [""], fontsize=7)
+    ax.set_ylabel("GFN2-xTB ligand strain (kcal/mol)")
+    ax.set_title("Crystal vs docked ligand strain")
+    _style(ax)
+    fig.text(0.5, -0.06, "Ligand only. Not a binding free energy.", ha="center", color=MUTED, fontsize=8)
+    fig.tight_layout()
+    fig.savefig(path, bbox_inches="tight", facecolor=FACE)
+    plt.close(fig)
+    return path
+
+
+def fig_vp35_occupancy(result: dict, path: Path | None = None) -> Path:
+    ensure_dirs()
+    path = path or (FIGURES / "fig8_vp35_occupancy.png")
+    fig, ax = plt.subplots(figsize=(3.54, 3.6), dpi=200)
+    fig.patch.set_facecolor(FACE)
+    n_open = int(result.get("n_open", 0))
+    n_closed = int(result.get("n_closed", 0))
+    ax.bar(["closed", "open"], [n_closed, n_open], color=[MUTED, TEAL], width=0.55)
+    ov = result.get("overlap") or {}
+    ax.set_ylabel("Strided frames")
+    ax.set_title("VP35 CA 225–295 occupancy")
+    frac = result.get("open_fraction", 0.0)
+    ax.text(
+        0.5, -0.18,
+        f"open {frac:.2f}  ·  lining ∩ prior {ov.get('cryptic_and_nmr', 0)}/{ov.get('n_cryptic', 0)}"
+        f"  ({ov.get('source', 'none')})",
+        transform=ax.transAxes, ha="center", color=MUTED, fontsize=8,
+    )
+    _style(ax)
+    fig.tight_layout()
+    fig.savefig(path, bbox_inches="tight", facecolor=FACE)
+    plt.close(fig)
+    return path
+
+
+def fig_rank_bars(rows: list, path: Path | None = None) -> Path:
+    """Geometry vs hybrid rank of labeled sites. Lower rank is better."""
+    ensure_dirs()
+    path = path or (FIGURES / "fig9_discovery_ranks.png")
+    panels = [(ranking, sites) for ranking, sites in rows if sites]
+    n = max(len(panels), 1)
+    fig, axes = plt.subplots(1, n, figsize=(3.7 * n, 3.9), dpi=200)
+    fig.patch.set_facecolor(FACE)
+    if n == 1:
+        axes = [axes]
+    titles = {
+        "tem1_horn": "TEM-1",
+        "kras_switch2": "KRAS",
+        "vp35_iid": "VP35",
+    }
+    site_labels = {
+        "omega_loop": "Ω-loop",
+        "switch2": "switch-II",
+        "nucleotide": "nucleotide",
+        "horn": "horn",
+        "catalytic": "catalytic",
+        "cryptic": "cryptic",
+    }
+    ymax = 1
+    for _ranking, sites in panels:
+        for row in sites:
+            if row.found and row.geometry_rank:
+                ymax = max(ymax, row.geometry_rank)
+            if row.found and row.hybrid_rank:
+                ymax = max(ymax, row.hybrid_rank)
+    for ax, (ranking, sites) in zip(axes, panels, strict=False):
+        labels = [site_labels.get(row.site, row.site) for row in sites]
+        x = np.arange(len(labels))
+        geo = [row.geometry_rank if row.found and row.geometry_rank else np.nan for row in sites]
+        hyb = [row.hybrid_rank if row.found and row.hybrid_rank else np.nan for row in sites]
+        width = 0.36
+        ax.bar(x - width / 2, geo, width=width, color=TEAL, label="geometry", zorder=2)
+        ax.bar(x + width / 2, hyb, width=width, color=SAGE, label="hybrid", zorder=2)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, fontsize=8)
+        ax.set_ylabel("Rank (lower is better)")
+        ax.set_ylim(0.5, ymax + 0.8)
+        ax.invert_yaxis()
+        ax.set_title(titles.get(ranking.case, ranking.case), color=TEXT, fontsize=11)
+        _style(ax)
+    if panels:
+        axes[-1].legend(frameon=False, fontsize=8)
+    fig.suptitle("Apo cavity rank of labeled sites", color=TEXT, fontsize=12, y=1.02)
+    fig.text(
+        0.5, -0.05,
+        "YAML linings used only after ranking. Hybrid = dscore × (1 + NMR enrichment).",
+        ha="center", color=MUTED, fontsize=8,
+    )
+    fig.tight_layout()
+    fig.savefig(path, bbox_inches="tight", facecolor=FACE)
+    plt.close(fig)
+    return path
+
+
+def fig_exchange_plane(rankings: list, path: Path | None = None) -> Path:
+    """Every apo cavity: lining exchange enrichment vs ligand-scale dscore."""
+    from pocket_atlas.rank.plane import SHORT_LABELS
+
+    ensure_dirs()
+    path = path or (FIGURES / "fig10_exchange_clearance.png")
+    n = len(rankings) + 1
+    ncols = 4
+    nrows = int(np.ceil(n / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(9.2, 2.35 * nrows), dpi=200, sharex=False, sharey=False)
+    fig.patch.set_facecolor(FACE)
+    axes = np.atleast_1d(axes).ravel()
+    for ax, ranking in zip(axes, rankings, strict=False):
+        xs = [s.enrichment for s in ranking.scored]
+        ys = [s.pocket.dscore for s in ranking.scored]
+        ax.axvline(1.0, color=MUTED, ls="--", lw=0.8, zorder=1)
+        if ys:
+            ax.axhline(float(np.median(ys)), color=GRID, ls=":", lw=0.8, zorder=1)
+        ax.scatter(xs, ys, s=16, color=TEAL, alpha=0.8, zorder=2, edgecolors="none")
+        if ranking.scored:
+            top = max(ranking.scored, key=lambda s: s.enrichment)
+            ax.scatter(
+                [top.enrichment],
+                [top.pocket.dscore],
+                s=56,
+                facecolors="none",
+                edgecolors=CORAL,
+                linewidths=1.3,
+                zorder=3,
+            )
+        ax.set_title(SHORT_LABELS.get(ranking.case, ranking.case), color=TEXT, fontsize=9)
+        _style(ax)
+    key = axes[len(rankings)]
+    key.set_xlim(0, 1)
+    key.set_ylim(0, 1)
+    key.set_xticks([])
+    key.set_yticks([])
+    key.text(0.25, 0.76, "static hole", ha="center", va="center", color=MUTED, fontsize=7, clip_on=False)
+    key.text(0.75, 0.76, "dynamic site", ha="center", va="center", color=SAGE, fontsize=7, clip_on=False)
+    key.text(0.25, 0.24, "noise", ha="center", va="center", color=MUTED, fontsize=7, clip_on=False)
+    key.text(0.75, 0.24, "catalytic /\ngating", ha="center", va="center", color=CORAL, fontsize=7, clip_on=False)
+    key.axvline(0.5, color=GRID, lw=0.8)
+    key.axhline(0.5, color=GRID, lw=0.8)
+    key.set_xlabel("enrichment →", fontsize=8)
+    key.set_ylabel("dscore →", fontsize=8)
+    key.set_title("quadrants", color=TEXT, fontsize=9)
+    _style(key)
+    for ax in axes[len(rankings) + 1 :]:
+        ax.axis("off")
+    fig.supxlabel("Exchange enrichment in cavity lining", color=TEXT, fontsize=10)
+    fig.supylabel("Clearance-maxima dscore", color=TEXT, fontsize=10)
+    fig.tight_layout()
+    fig.savefig(path, bbox_inches="tight", facecolor=FACE)
+    plt.close(fig)
+    return path

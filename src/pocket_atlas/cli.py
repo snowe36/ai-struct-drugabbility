@@ -185,3 +185,138 @@ def figures_main(argv: list[str] | None = None) -> None:
     paths = write_all_figures(camps)
     for path in paths:
         print(path)
+
+
+def dock_main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="GNINA residue-box docking (fail closed)")
+    parser.add_argument("--cases", nargs="+", default=["tem1_horn", "kras_switch2"])
+    _prior_arg(parser)
+    parser.add_argument("--exhaustiveness", type=int, default=8)
+    args = parser.parse_args(argv)
+    from pocket_atlas.dock import DockUnavailable, dock_case, write_dock_report
+
+    jobs = []
+    try:
+        for name in args.cases:
+            jobs.extend(dock_case(name, prior=args.prior, exhaustiveness=args.exhaustiveness))
+    except DockUnavailable as exc:
+        print(exc)
+        return
+    path = write_dock_report(jobs)
+    print(path.read_text())
+
+
+def strain_main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="Ligand-only GFN2-xTB strain (fail closed)")
+    parser.add_argument("--cases", nargs="+", default=["tem1_horn", "kras_switch2"])
+    args = parser.parse_args(argv)
+    from pocket_atlas.chem.xtb_strain import XtbUnavailable, strain_case, write_strain_report
+
+    payloads = []
+    try:
+        for name in args.cases:
+            payloads.append(strain_case(name))
+    except XtbUnavailable as exc:
+        print(exc)
+        return
+    path = write_strain_report(payloads)
+    print(path.read_text())
+
+
+def prepare_crystal_main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="Prepare a crystal-only case (VP35 3FKE)")
+    _case_arg(parser)
+    args = parser.parse_args(argv)
+    from pocket_atlas.pipeline import prepare_crystal
+
+    path = prepare_crystal(args.case)
+    print(path)
+
+
+def rank_main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(
+        description="Rank apo cavities without YAML site linings, then eval ranks"
+    )
+    parser.add_argument("--case", default=None, choices=list_cases())
+    parser.add_argument(
+        "--cases",
+        nargs="+",
+        default=None,
+        choices=list_cases(),
+    )
+    _prior_arg(parser)
+    parser.add_argument(
+        "--open-frame",
+        action="store_true",
+        help="VP35: also rank a high-CV FAH frame if the strided xtc exists",
+    )
+    args = parser.parse_args(argv)
+    names = args.cases or ([args.case] if args.case else ["tem1_horn", "kras_switch2"])
+    from pocket_atlas.rank import rank_case
+    from pocket_atlas.rank.eval import (
+        eval_labeled_sites,
+        write_combined_rank_report,
+        write_rank_report,
+    )
+    from pocket_atlas.rank.miner import MinerUnavailable, try_miner_scores
+    from pocket_atlas.viz.figures import fig_rank_bars
+
+    combined = []
+    miner_skip_printed = False
+    for name in names:
+        miner_scores = None
+        try:
+            miner_scores = try_miner_scores(name)
+        except MinerUnavailable as exc:
+            if not miner_skip_printed:
+                print(f"PocketMiner skipped: {exc}")
+                miner_skip_printed = True
+        ranking = rank_case(name, prior=args.prior, miner_scores=miner_scores)
+        sites = eval_labeled_sites(ranking)
+        write_rank_report(ranking, sites)
+        combined.append((ranking, sites))
+        print(json.dumps({"ranking": ranking.as_dict(), "sites": [s.as_dict() for s in sites]}, indent=2))
+
+    if "vp35_iid" in names and args.open_frame:
+        from pocket_atlas.rank.appearance import FrameUnavailable, rank_open_frame
+
+        try:
+            opened, extra = rank_open_frame(prior=args.prior)
+            open_sites = eval_labeled_sites(opened)
+            write_rank_report(opened, open_sites)
+            combined.append((opened, open_sites))
+            print(json.dumps({
+                "open": opened.as_dict(),
+                "sites": [s.as_dict() for s in open_sites],
+                "extra": extra,
+            }, indent=2))
+        except FrameUnavailable as exc:
+            print(f"VP35 open-frame skipped: {exc}")
+
+    path = write_combined_rank_report(combined)
+    fig = fig_rank_bars(combined)
+    print(f"wrote {path}")
+    print(f"wrote {fig}")
+
+
+def plane_main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(
+        description="Map experimental CPMG/literature exchange onto apo clearance maxima"
+    )
+    parser.parse_args(argv)
+    from pocket_atlas.rank.plane import run_exchange_plane, write_plane_report
+    from pocket_atlas.viz.figures import fig_exchange_plane
+
+    rows = run_exchange_plane()
+    report = write_plane_report(rows)
+    fig = fig_exchange_plane(rows)
+    for ranking in rows:
+        top = max(ranking.scored, key=lambda s: s.enrichment) if ranking.scored else None
+        extra = ranking.extra
+        print(
+            f"{ranking.case:12s} {ranking.pdb_id}  pockets={len(ranking.scored):2d}  "
+            f"prior={ranking.n_prior:3d}  mapped={extra.get('mapped_frac', '')}  "
+            f"top_enr={None if top is None else round(top.enrichment, 2)}"
+        )
+    print(f"wrote {report}")
+    print(f"wrote {fig}")

@@ -148,3 +148,16 @@ def write_campaign_json(campaign: Campaign, path: Path | None = None) -> Path:
     path = path or (PROCESSED / f"{campaign.case.name}_campaign.json")
     path.write_text(json.dumps(campaign.as_dict(), indent=2))
     return path
+
+
+def prepare_crystal(case_name: str) -> Path:
+    """Write a prepared PDB for crystal-only cases (VP35 3FKE)."""
+    ensure_dirs()
+    case = load_case(case_name)
+    structures = case.raw["structures"]
+    key = "crystal" if "crystal" in structures else "apo"
+    spec = structures[key]
+    prepared = prepare_structure(load_structure(spec["pdb_id"]), chain=case.chain)
+    out = PROCESSED / f"{case.name}_{key}_{spec['pdb_id']}.pdb"
+    write_pdb(prepared, out)
+    return out
