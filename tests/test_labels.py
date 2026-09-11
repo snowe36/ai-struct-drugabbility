@@ -1,5 +1,12 @@
 from pocket_atlas.cases import load_case
-from pocket_atlas.dynamics.labels import load_relaxdb_bundle, relaxdb_residues, resolve_prior
+from pocket_atlas.dynamics.align import map_cpmg_index_to_resseq
+from pocket_atlas.dynamics.labels import (
+    cpmg_exchange_residues,
+    list_cpmg_entries,
+    load_relaxdb_bundle,
+    relaxdb_residues,
+    resolve_prior,
+)
 
 
 def test_relaxdb_kras_is_official_cpmg():
@@ -25,6 +32,23 @@ def test_prior_literature_fallback_for_tem1():
     assert source == "nmr_literature"
     assert 166 in residues
     assert residues == set(case.nmr_residues)
+
+
+def test_cpmg_panel_has_ten_experimental_entries():
+    ids = list_cpmg_entries()
+    assert len(ids) == 10
+    assert "CYPA_CPMG" in ids
+    assert "AQADK_CPMG" in ids
+    assert len(cpmg_exchange_residues("KRAS_CPMG")) == 58
+    assert "p" not in load_relaxdb_bundle()["entries"]["RNASE_CPMG"]["label"]
+
+
+def test_map_cpmg_index_substring():
+    cpmg = "ABCDEFGHIJKLMNOP"
+    pdb = "XXDEFGHIJKLXX"
+    resseqs = list(range(10, 10 + len(pdb)))
+    mapping = map_cpmg_index_to_resseq(cpmg, resseqs, pdb)
+    assert mapping[4] == 12  # D at cpmg 4 → pdb index 2 → resseq 12
 
 
 def test_prior_relaxdb_for_kras():
